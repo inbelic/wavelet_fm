@@ -7,8 +7,8 @@ defmodule WaveletFM.FMs.FM do
   schema "fms" do
     field :username, :string
     field :freq, :float
-    field :wavelets, {:array, :string}
     belongs_to :user, WaveletFM.Accounts.User
+    has_many :post, WaveletFM.Posts.Post
 
     timestamps(type: :utc_datetime)
   end
@@ -16,7 +16,7 @@ defmodule WaveletFM.FMs.FM do
   @doc false
   def changeset(fm, attrs) do
     fm
-    |> cast(attrs, [:freq, :username, :wavelets])
-    |> validate_required([:freq, :username, :wavelets])
+    |> cast(attrs, [:freq, :username])
+    |> validate_required([:freq, :username])
   end
 end
