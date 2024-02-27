@@ -8,25 +8,41 @@ defmodule WaveletFMWeb.Host do
   def mount(_params, _session, socket) do
     changeset = Wavelets.change_wavelet(%Wavelet{})
 
+        socket =
+      socket
+      |> assign(check_errors: false)
+      |> assign(wid: nil)
+      |> assign_form(changeset)
+
+    {:ok, socket, temporary_assigns: [form: nil, wavelets: []]}
+  end
+
+  def handle_params(_params, _uri, socket) do
     temp_wavelet = %Wavelet{id: "ok", title: "As It Was",
       artist: "Harry Styles",
       cover: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
       links: []}
     wavelets =
-      [temp_wavelet, temp_wavelet]
+      1 .. 3
+      |> Enum.map(fn _ -> temp_wavelet end)
       |> Enum.with_index(fn element, index -> {index, element} end)
-
-    socket =
-      socket
-      |> assign(check_errors: false)
-      |> assign(wid: nil, wavelets: wavelets)
-      |> assign_form(changeset)
-
-    {:ok, socket, temporary_assigns: [form: nil]}
+    {:noreply, socket |> assign(wavelets: wavelets)}
   end
   
-  def handle_event("selected", %{"wid" => wid}, socket) do
-    {:noreply, assign(socket, wid: wid)}
+  def handle_event("selected", %{"wid" => cur_wid}, socket) do
+    case socket.assigns.wid do
+      nil ->
+        {:noreply, assign(socket, wid: cur_wid)}
+      wid ->
+        other_wavelet = %Wavelet{id: "dubius", title: "As It Wasn't",
+          artist: "Harry Ugly",
+          cover: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
+          links: []}
+        wavelets =
+          socket.assigns.wavelets
+          |> replace_selected(wid, other_wavelet)
+        {:noreply, assign(socket, wavelets: wavelets) |> push_patch(to: ~p"/host")}
+    end
   end
 
   def handle_event("validate", %{"wavelet" => wavelet_params}, socket) do
@@ -45,6 +61,8 @@ defmodule WaveletFMWeb.Host do
     end
   end
 
+  # Helper functions for the handle_event functions
+
   defp assign_form(socket, %Ecto.Changeset{} = changeset) do
     form = to_form(changeset, as: "wavelet")
 
@@ -59,5 +77,14 @@ defmodule WaveletFMWeb.Host do
     attrs
     |> Map.put_new("cover", "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228")
     |> Map.put_new("links", [])
+  end
+
+  defp replace_selected(wavelets, wid, replacement_wavelet) do
+    Enum.map(wavelets,
+      fn {cur_wid, wavelet} ->
+        if cur_wid == wid do replacement_wavelet
+        else wavelet
+        end
+      end)
   end
 end
