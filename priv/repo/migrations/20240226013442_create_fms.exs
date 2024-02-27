@@ -7,11 +7,11 @@ defmodule WaveletFM.Repo.Migrations.CreateFms do
       add :freq, :float
       add :username, :string
       add :wavelets, {:array, :string}
-      add :user, references(:users, on_delete: :delete_all, type: :binary_id)
+      add :user_id, references(:users, on_delete: :delete_all, type: :binary_id)
 
       timestamps(type: :utc_datetime)
     end
 
-    create index(:fms, [:user])
+    create index(:fms, [:user_id])
   end
 end

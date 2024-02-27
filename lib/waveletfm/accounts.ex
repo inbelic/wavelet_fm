@@ -6,7 +6,7 @@ defmodule WaveletFM.Accounts do
   import Ecto.Query, warn: false
   alias WaveletFM.Repo
 
-  alias WaveletFM.Accounts.{User, UserToken, UserNotifier}
+  alias WaveletFM.Accounts.{User, UserFM, UserToken, UserNotifier}
 
   ## Database getters
 
@@ -76,12 +76,12 @@ defmodule WaveletFM.Accounts do
   """
   def register_user(attrs) do
     %User{}
-    |> User.registration_changeset(attrs)
+    |> UserFM.registration_changeset(attrs)
     |> Repo.insert()
   end
 
   @doc """
-  Returns an `%Ecto.Changeset{}` for tracking user changes.
+  Returns an `%Ecto.Changeset{}` for tracking user_fm changes.
 
   ## Examples
 
@@ -89,8 +89,12 @@ defmodule WaveletFM.Accounts do
       %Ecto.Changeset{data: %User{}}
 
   """
-  def change_user_registration(%User{} = user, attrs \\ %{}) do
-    User.registration_changeset(user, attrs, hash_password: false, validate_email: false)
+  def change_user_registration(user_or_user_fm, attrs \\ %{})
+  def change_user_registration(%UserFM{} = user, attrs) do
+    UserFM.registration_changeset(user, attrs, hash_password: false, validate_email: false)
+  end
+  def change_user_registration(%User{} = user, attrs) do
+    UserFM.registration_changeset(user, attrs, hash_password: false, validate_email: false)
   end
 
   ## Settings

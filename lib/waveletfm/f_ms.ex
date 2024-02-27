@@ -42,15 +42,16 @@ defmodule WaveletFM.FMs do
 
   ## Examples
 
-      iex> create_fm(%{field: value})
+      iex> create_fm(user, %{field: value})
       {:ok, %FM{}}
 
-      iex> create_fm(%{field: bad_value})
+      iex> create_fm(user, %{field: bad_value})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_fm(attrs \\ %{}) do
-    %FM{}
+  def create_fm(user, attrs \\ %{}) do
+    user
+    |> Ecto.build_assoc(:fms)
     |> FM.changeset(attrs)
     |> Repo.insert()
   end
