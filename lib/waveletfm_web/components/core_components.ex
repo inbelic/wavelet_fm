@@ -600,6 +600,10 @@ defmodule WaveletFMWeb.CoreComponents do
 
   ## JS Commands
 
+  def id(js \\ %JS{}) do
+    js
+  end
+
   def show(js \\ %JS{}, selector) do
     JS.show(js,
       to: selector,

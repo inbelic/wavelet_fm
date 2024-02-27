@@ -2,7 +2,7 @@
   <.live_component
      module = {HostWaveletsComponent}
      id="host-wavelets"
-     mid="search-modal"
+     js={ show_modal("search-modal") }
      wavelets={@wavelets}
   />
   <.modal id="search-modal">
@@ -23,10 +23,18 @@
         <.input field={@form[:artist]} type="text" label="Artist" required />
 
         <:actions>
-        <.button class="w-full" phx-disable-with="Creating account...">
-        Create an account
-        </.button>
+          <.button class="w-full" phx-disable-with="Creating account...">
+            Search
+          </.button>
         </:actions>
-      </.simple_form>
+    </.simple_form>
+    <div style="height: 0.7rem">
+    </div>
+    <.live_component
+       module = {HostWaveletsComponent}
+       id="search-wavelets"
+       js={hide_modal("search-modal")}
+       wavelets={@wavelets}
+    />
   </.modal>
 </div>

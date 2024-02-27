@@ -6,10 +6,7 @@ defmodule WaveletFMWeb.Components.HostWaveletsComponent do
     <div>
       <%= for {wid, wavelet} <- @wavelets do %>
         <div class="wavelet-container"
-          phx-click={
-          show_modal(@mid)
-          |> JS.push("selected", value: %{wid: wid})
-        }>
+          phx-click={@js |> JS.push("selected", value: %{wid: wid})}>
           <div class="wavelet-cover">
             <div class="cover-wrapper">
               <img src={wavelet.cover} alt="Cover Art"/>
