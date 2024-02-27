@@ -7,6 +7,7 @@ defmodule WaveletFM.FMs do
   alias WaveletFM.Repo
 
   alias WaveletFM.FMs.FM
+  alias WaveletFM.Accounts.User
 
   @doc """
   Returns the list of fms.
@@ -36,6 +37,28 @@ defmodule WaveletFM.FMs do
 
   """
   def get_fm!(id), do: Repo.get!(FM, id)
+
+  @doc """
+  Gets a single fm through the user_assoc.
+
+  Raises `Ecto.NoResultsError` if the Fm does not exist.
+
+  ## Examples
+
+      iex> get_fm_by_user!(user)
+      %FM{}
+
+      iex> get_fm_by_user!(user)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_fm_by_user(%User{id: id}) do
+    query =
+      from fm in FM, where: [user_id: ^id],
+        select: fm
+
+    Repo.one(query)
+  end
 
   @doc """
   Creates a fm.
