@@ -18,7 +18,7 @@ defmodule WaveletFMWeb.Host do
 
     socket =
       socket
-      |> assign(trigger_submit: false, check_errors: false)
+      |> assign(check_errors: false)
       |> assign(wid: nil, wavelets: wavelets)
       |> assign_form(changeset)
 
@@ -38,7 +38,7 @@ defmodule WaveletFMWeb.Host do
     case Wavelets.create_wavelet(wavelet_params |> default_attrs) do
       {:ok, wavelet} ->
         changeset = Wavelets.change_wavelet(wavelet, wavelet_params |> default_attrs)
-        {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
+        {:noreply, socket |> assign_form(changeset)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}
