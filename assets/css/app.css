@@ -3,3 +3,56 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+@font-face {
+    font-family: "Rubik";
+    src: url("/fonts/Rubik-Regular.ttf");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Rubik";
+    src: url("/fonts/Rubik-Bold.ttf");
+    font-weight: bold;
+    font-style: bold;
+}
+
+.wavelets-container {
+    align-items: center;
+}
+
+.wavelet-container {
+    display: flex;
+    height: 20%;
+    border-radius: 10px;
+    border: 2px solid black;
+    overflow: hidden;
+
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 2.5;
+}
+
+.wavelet-container:hover {
+    background-color: #c0c0c0;
+}
+
+.wavelet-sub-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+}
+
+.wavelet-cover {
+    height: 100%;
+    aspect-ratio: 1;
+}
+
+.cover-wrapper {
+    padding: 5%;
+}
+
+.wavelet-text {
+    flex-basis: calc(25% - 2px);
+    height: 25%;
+}

@@ -1,0 +1,32 @@
+<div class="mx-auto font-brand">
+  <.live_component
+     module = {HostWaveletsComponent}
+     id="host-wavelets"
+     mid="search-modal"
+     wavelets={@wavelets}
+  />
+  <.modal id="search-modal">
+      <.simple_form
+        for={@form}
+        id="wavelet_form"
+        phx-submit="save"
+        phx-change="validate"
+        phx-trigger-action={@trigger_submit}
+        action={~p"/host"}
+        method="get"
+      >
+        <.error :if={@check_errors}>
+          Oops, something went wrong! Please check the errors below.
+        </.error>
+        
+        <.input field={@form[:title]} type="text" label="Title" required />
+        <.input field={@form[:artist]} type="text" label="Artist" required />
+
+        <:actions>
+        <.button class="w-full" phx-disable-with="Creating account...">
+        Create an account
+        </.button>
+        </:actions>
+      </.simple_form>
+  </.modal>
+</div>
