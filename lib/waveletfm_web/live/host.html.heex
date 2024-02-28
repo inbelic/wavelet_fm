@@ -9,7 +9,7 @@
       <.simple_form
         for={@form}
         id="wavelet_form"
-        phx-submit="save"
+        phx-submit="search"
         phx-change="validate"
       >
         <.error :if={@check_errors}>
@@ -20,18 +20,18 @@
         <.input field={@form[:artist]} type="text" label="Artist" required />
 
         <:actions>
-          <.button class="w-full" phx-disable-with="Creating account...">
+          <.button class="w-full" phx-disable-with="Searching...">
             Search
           </.button>
         </:actions>
     </.simple_form>
-    <div style="height: 0.7rem">
+    <div style="height: 1rem">
     </div>
     <.live_component
        module = {HostWaveletsComponent}
        id="search-wavelets"
        js={hide_modal("search-modal")}
-       wavelets={@wavelets}
+       wavelets={@search_wavelets}
     />
   </.modal>
 </div>

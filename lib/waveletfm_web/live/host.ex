@@ -8,6 +8,8 @@ defmodule WaveletFMWeb.Host do
   alias WaveletFM.Posts
   alias WaveletFM.FMs
 
+  alias External.GenWavelets
+
   def mount(_params, _session, socket) do
     changeset = Wavelets.change_wavelet(%Wavelet{})
 
@@ -28,7 +30,7 @@ defmodule WaveletFMWeb.Host do
       |> append_empty()
       |> Enum.with_index(fn element, index -> {index, element} end)
 
-    {:noreply, socket |> assign(wavelets: wavelets)}
+    {:noreply, socket |> assign(wavelets: wavelets) |> assign(search_wavelets: [])}
   end
   
   def handle_event("selected", %{"wid" => cur_wid}, socket) do
@@ -36,14 +38,16 @@ defmodule WaveletFMWeb.Host do
       nil ->
         {:noreply, assign(socket, wid: cur_wid)}
       wid ->
-        other_wavelet = %Wavelet{id: "dubius", title: "As It Wasn't",
-          artist: "Harry Ugly",
-          cover: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
-          links: []}
-        wavelets =
-          socket.assigns.wavelets
-          |> replace_selected(wid, other_wavelet)
-        {:noreply, assign(socket, wavelets: wavelets) |> push_patch(to: ~p"/host")}
+        {_, replace_wavelet} = Enum.at(socket.assigns.wavelets, wid)
+        {:ok, _} = case replace_wavelet.id do
+          nil -> {:ok, :ok}
+          _ -> Wavelets.delete_wavelet(replace_wavelet)
+        end
+
+        {_, searched_wavelet} = Enum.at(socket.assigns.search_wavelets, cur_wid)
+        Wavelets.create_wavelet(searched_wavelet)
+
+        {:noreply, push_patch(socket, to: ~p"/host")}
     end
   end
 
@@ -52,15 +56,18 @@ defmodule WaveletFMWeb.Host do
     {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end
   
-  def handle_event("save", %{"wavelet" => wavelet_params}, socket) do
-    case Wavelets.create_wavelet(wavelet_params |> default_attrs) do
-      {:ok, wavelet} ->
-        changeset = Wavelets.change_wavelet(wavelet, wavelet_params |> default_attrs)
-        {:noreply, socket |> assign_form(changeset)}
+  def handle_event("search", %{"wavelet" => wavelet_params}, socket) do
+    %{"title" => title, "artist" => artist} = wavelet_params
+    search_wavelets =
+      GenWavelets.gen_search(title, artist)
+      |> Enum.with_index(fn element, index -> {index, element} end)
 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, socket |> assign(check_errors: true) |> assign_form(changeset)}
-    end
+    changeset = Wavelets.change_wavelet(%Wavelet{}, wavelet_params |> default_attrs)
+    socket =
+      socket
+      |> assign(search_wavelets: search_wavelets)
+      |> assign_form(changeset)
+    {:noreply, socket}
   end
 
   # Helper functions for the handle_event functions

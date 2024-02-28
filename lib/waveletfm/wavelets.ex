@@ -90,7 +90,16 @@ defmodule WaveletFM.Wavelets do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_wavelet(attrs \\ %{}) do
+  def create_wavelet(wavelet_or_attrs \\ %{})
+
+  def create_wavelet(%Wavelet{} = wavelet) do
+    wavelet
+    |> insert_id()
+    |> Wavelet.changeset(%{})
+    |> Repo.insert()
+  end
+
+  def create_wavelet(attrs ) do
     %Wavelet{}
     |> Wavelet.changeset(insert_id(attrs))
     |> Repo.insert()
