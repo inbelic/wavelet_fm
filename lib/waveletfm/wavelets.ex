@@ -88,15 +88,13 @@ defmodule WaveletFM.Wavelets do
 
   ## Examples
 
-      iex> create_wavelet(%{field: value})
+      iex> create_wavelet(%Wavelet{})
       {:ok, %Wavelet{}}
 
-      iex> create_wavelet(%{field: bad_value})
+      iex> create_wavelet(%Wavelet{})
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_wavelet(wavelet_or_attrs \\ %{})
-
   def create_wavelet(%Wavelet{} = wavelet) do
     case get_wavelet(wavelet.artist, wavelet.title) do
       nil ->
@@ -105,18 +103,14 @@ defmodule WaveletFM.Wavelets do
         |> Wavelet.changeset(%{})
         |> Repo.insert()
       found_wavelet ->
-        {:ok, found_wavelet}
-    end
-  end
-
-  def create_wavelet(%{"artist" => artist, "title" => title} = attrs) do
-    case get_wavelet(artist, title) do
-      nil ->
-        %Wavelet{}
-        |> Wavelet.changeset(insert_id(attrs))
-        |> Repo.insert()
-      found_wavelet ->
-        {:ok, found_wavelet}
+        wavelet.links
+        |> Enum.reject(fn item -> Enum.member?(found_wavelet.links, item) end)
+        |> case do
+          [] -> {:ok, found_wavelet}
+          new_links ->
+            attrs = %{links: [found_wavelet.links ++ new_links]}
+            update_wavelet(found_wavelet, attrs)
+        end
     end
   end
 
