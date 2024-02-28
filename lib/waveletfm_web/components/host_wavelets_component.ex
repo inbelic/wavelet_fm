@@ -19,7 +19,7 @@ defmodule WaveletFMWeb.Components.HostWaveletsComponent do
               <bold><%= wavelet.title %></bold>
             </div>
             <div class="wavelet-text text-sm ml-2">
-              by <%= wavelet.artist %>
+            <%= if wavelet.artist != "" do %> by <% end %><%= wavelet.artist %>
             </div>
             <div class="wavelet-text">
             </div>

@@ -8,7 +8,7 @@ defmodule WaveletFM.FMs.FM do
     field :username, :string
     field :freq, :float
     belongs_to :user, WaveletFM.Accounts.User
-    has_many :post, WaveletFM.Posts.Post
+    has_many :posts, WaveletFM.Posts.Post
 
     timestamps(type: :utc_datetime)
   end

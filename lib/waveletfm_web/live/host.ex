@@ -5,27 +5,29 @@ defmodule WaveletFMWeb.Host do
   alias WaveletFM.Wavelets.Wavelet
   alias WaveletFMWeb.Components.HostWaveletsComponent
 
+  alias WaveletFM.Posts
+  alias WaveletFM.FMs
+
   def mount(_params, _session, socket) do
     changeset = Wavelets.change_wavelet(%Wavelet{})
 
-        socket =
+    socket =
       socket
       |> assign(check_errors: false)
       |> assign(wid: nil)
       |> assign_form(changeset)
 
-    {:ok, socket, temporary_assigns: [form: nil, wavelets: []]}
+    {:ok, socket, temporary_assigns: [form: nil]}
   end
 
   def handle_params(_params, _uri, socket) do
-    temp_wavelet = %Wavelet{id: "ok", title: "As It Was",
-      artist: "Harry Styles",
-      cover: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
-      links: []}
     wavelets =
-      1 .. 3
-      |> Enum.map(fn _ -> temp_wavelet end)
+      socket.assigns.current_user
+      |> FMs.get_fm_by_user()
+      |> Posts.get_posts_by_fm()
+      |> append_empty()
       |> Enum.with_index(fn element, index -> {index, element} end)
+
     {:noreply, socket |> assign(wavelets: wavelets)}
   end
   
@@ -75,8 +77,17 @@ defmodule WaveletFMWeb.Host do
 
   defp default_attrs(attrs) do
     attrs
-    |> Map.put_new("cover", "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228")
+    |> Map.put_new("cover", "")
     |> Map.put_new("links", [])
+  end
+
+  defp empty_wavelet() do
+    %Wavelet{id: "", title: "Not Selected", artist: "", cover: "", links: []}
+  end
+
+  defp append_empty(list) do
+    to_take = max(0, 5 - length(list))
+    list ++ Enum.map(1..to_take, fn _ -> empty_wavelet() end)
   end
 
   defp replace_selected(wavelets, wid, replacement_wavelet) do

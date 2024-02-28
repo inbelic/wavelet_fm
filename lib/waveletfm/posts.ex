@@ -7,6 +7,7 @@ defmodule WaveletFM.Posts do
   alias WaveletFM.Repo
 
   alias WaveletFM.Posts.Post
+  alias WaveletFM.FMs.FM
 
   @doc """
   Returns the list of post.
@@ -36,6 +37,32 @@ defmodule WaveletFM.Posts do
 
   """
   def get_post!(id), do: Repo.get!(Post, id)
+
+  @doc """
+  Gets all current posts associated to the fm.
+
+  Raises `Ecto.NoResultsError` if the Post does not exist.
+
+  ## Examples
+
+      iex> get_post_by_fm(fm)
+      %Post{}
+
+      iex> get_post_by_fm(fm)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_posts_by_fm(%FM{} = fm) do
+    query =
+      from post in Post,
+        join: fm in assoc(post, :fm),
+        where: fm.id == ^fm.id,
+        select: post,
+        order_by: [desc: :inserted_at],
+        limit: 5
+
+    Repo.all(query)
+  end
 
   @doc """
   Creates a post.

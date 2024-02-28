@@ -6,7 +6,6 @@ defmodule WaveletFM.Repo.Migrations.CreateFms do
       add :id, :binary_id, primary_key: true
       add :freq, :float
       add :username, :string
-      add :wavelets, {:array, :string}
       add :user_id, references(:users, on_delete: :delete_all, type: :binary_id)
 
       timestamps(type: :utc_datetime)
