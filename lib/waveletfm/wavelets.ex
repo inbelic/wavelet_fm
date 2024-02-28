@@ -42,12 +42,15 @@ defmodule WaveletFM.Wavelets do
   @doc """
   Gets a single wavelet from the title and artist.
   
-  Raises `Ecto.NoResultsError` if the Wavelet does not exist.
+  Returns nil if the Wavelet does not exist.
   """
-  def get_wavelet!(artist, title) do
-      :crypto.hash(:md5, title <> artist)
-      |> Base.encode64
-      |> get_wavelet!()
+  def get_wavelet(artist, title) do
+    id = insert_id_helper(title, artist)
+    try do
+      get_wavelet!(id)
+    rescue
+      Ecto.NoResultsError -> nil
+    end
   end
 
   @doc """
@@ -79,7 +82,8 @@ defmodule WaveletFM.Wavelets do
   end
 
   @doc """
-  Creates a wavelet.
+  Creates a wavelet if the id is not found, otherwise it returns the found
+  wavelet.
 
   ## Examples
 
@@ -93,16 +97,26 @@ defmodule WaveletFM.Wavelets do
   def create_wavelet(wavelet_or_attrs \\ %{})
 
   def create_wavelet(%Wavelet{} = wavelet) do
-    wavelet
-    |> insert_id()
-    |> Wavelet.changeset(%{})
-    |> Repo.insert()
+    case get_wavelet(wavelet.artist, wavelet.title) do
+      nil ->
+        wavelet
+        |> insert_id()
+        |> Wavelet.changeset(%{})
+        |> Repo.insert()
+      found_wavelet ->
+        {:ok, found_wavelet}
+    end
   end
 
-  def create_wavelet(attrs ) do
-    %Wavelet{}
-    |> Wavelet.changeset(insert_id(attrs))
-    |> Repo.insert()
+  def create_wavelet(%{"artist" => artist, "title" => title} = attrs) do
+    case get_wavelet(artist, title) do
+      nil ->
+        %Wavelet{}
+        |> Wavelet.changeset(insert_id(attrs))
+        |> Repo.insert()
+      found_wavelet ->
+        {:ok, found_wavelet}
+    end
   end
 
   @doc """
@@ -152,22 +166,20 @@ defmodule WaveletFM.Wavelets do
     Wavelet.changeset(wavelet, insert_id(attrs))
   end
 
-  defp insert_id(%Wavelet{:title => title, :artist => artist} = attrs) do
-    insert_id_helper(attrs, title, artist)
+  defp insert_id(%Wavelet{:title => title, :artist => artist} = wavelet) do
+    %Wavelet{wavelet | id: insert_id_helper(title, artist)}
   end
 
   defp insert_id(%{"title" => title, "artist" => artist} = attrs) do
-    insert_id_helper(attrs, title, artist)
+    Map.put(attrs, "id", insert_id_helper(title, artist))
   end
 
   defp insert_id(attrs) do
     attrs
   end
 
-  defp insert_id_helper(attrs, title, artist) do
-    hashed_id =
-      :crypto.hash(:md5, title <> artist)
-      |> Base.encode64
-    Map.put(attrs, "id", hashed_id)
+  defp insert_id_helper(title, artist) do
+    :crypto.hash(:md5, title <> artist)
+    |> Base.encode64
   end
 end

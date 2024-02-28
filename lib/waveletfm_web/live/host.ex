@@ -11,26 +11,29 @@ defmodule WaveletFMWeb.Host do
   alias External.GenWavelets
 
   def mount(_params, _session, socket) do
-    changeset = Wavelets.change_wavelet(%Wavelet{})
-
-    socket =
-      socket
-      |> assign(check_errors: false)
-      |> assign(wid: nil)
-      |> assign_form(changeset)
+    socket = socket |> assign(check_errors: false)
 
     {:ok, socket, temporary_assigns: [form: nil]}
   end
 
   def handle_params(_params, _uri, socket) do
+    changeset = Wavelets.change_wavelet(%Wavelet{})
+
     wavelets =
       socket.assigns.current_user
       |> FMs.get_fm_by_user()
       |> Wavelets.get_wavelets_by_fm()
-      |> append_empty()
+      |> append_empties(5)
       |> Enum.with_index(fn element, index -> {index, element} end)
 
-    {:noreply, socket |> assign(wavelets: wavelets) |> assign(search_wavelets: [])}
+    socket =
+      socket
+      |> assign(wid: nil)
+      |> assign(wavelets: wavelets)
+      |> assign(search_wavelets: [])
+      |> assign_form(changeset)
+
+    {:noreply, socket}
   end
   
   def handle_event("selected", %{"wid" => cur_wid}, socket) do
@@ -38,14 +41,28 @@ defmodule WaveletFMWeb.Host do
       nil ->
         {:noreply, assign(socket, wid: cur_wid)}
       wid ->
+        # Determine the wavelet that will be replaced from the users fm
         {_, replace_wavelet} = Enum.at(socket.assigns.wavelets, wid)
-        {:ok, _} = case replace_wavelet.id do
-          nil -> {:ok, :ok}
-          _ -> Wavelets.delete_wavelet(replace_wavelet)
-        end
 
+        current_fm = socket.assigns.current_user |> FMs.get_fm_by_user()
+
+        # If the wavelet is not an empty one, then delete the parent post
+        {:ok, _} =
+          current_fm
+          |> Posts.get_posts_by_fm()
+          |> Enum.find(fn post ->
+            post.wavelet == replace_wavelet.id
+          end)
+          |> case do
+            nil -> {:ok, nil}
+            post -> Posts.delete_post(post)
+          end
+
+        # Create a new post on the users fm with the selected search wavelet
+        # values
         {_, searched_wavelet} = Enum.at(socket.assigns.search_wavelets, cur_wid)
-        Wavelets.create_wavelet(searched_wavelet)
+        {:ok, wavelet} = Wavelets.create_wavelet(searched_wavelet)
+        Posts.create_post(current_fm, wavelet)
 
         {:noreply, push_patch(socket, to: ~p"/host")}
     end
@@ -92,17 +109,12 @@ defmodule WaveletFMWeb.Host do
     %Wavelet{id: nil, title: "Not Selected", artist: "", cover: "", links: []}
   end
 
-  defp append_empty(list) do
-    to_take = max(0, 5 - length(list))
-    list ++ Enum.map(1..to_take, fn _ -> empty_wavelet() end)
+  defp append_empties(list, num) when num <= length(list) do
+    list
   end
 
-  defp replace_selected(wavelets, wid, replacement_wavelet) do
-    Enum.map(wavelets,
-      fn {cur_wid, wavelet} ->
-        if cur_wid == wid do replacement_wavelet
-        else wavelet
-        end
-      end)
+  defp append_empties(list, num) do
+    to_take = max(0, num - length(list))
+    list ++ Enum.map(1..to_take, fn _ -> empty_wavelet() end)
   end
 end

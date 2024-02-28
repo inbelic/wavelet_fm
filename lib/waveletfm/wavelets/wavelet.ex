@@ -15,7 +15,7 @@ defmodule WaveletFM.Wavelets.Wavelet do
   def changeset(wavelet, attrs) do
     wavelet
     |> cast(attrs, [:id, :title, :artist, :links, :cover])
-    |> validate_required([:id, :title, :artist, :links, :cover])
+    |> validate_required([:id, :title, :artist])
     |> unsafe_validate_unique(:id, WaveletFM.Repo)
     |> unique_constraint(:id)
   end

@@ -8,6 +8,7 @@ defmodule WaveletFM.Posts do
 
   alias WaveletFM.FMs.FM
   alias WaveletFM.Posts.Post
+  alias WaveletFM.Wavelets.Wavelet
 
   @doc """
   Returns the list of post.
@@ -69,17 +70,24 @@ defmodule WaveletFM.Posts do
 
   ## Examples
 
-      iex> create_post(%{field: value})
+      iex> create_post(%FM{} = fm, %Wavelet{} = wavelet)
       {:ok, %Post{}}
 
-      iex> create_post(%{field: bad_value})
+      iex> create_post(%FM{} = fm, %Wavelet{} = wavelet)
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_post(attrs \\ %{}) do
-    %Post{}
+  def create_post(%FM{} = fm, %Wavelet{} = wavelet) do
+    attrs = init_attrs(wavelet.id)
+
+    fm
+    |> Ecto.build_assoc(:posts)
     |> Post.changeset(attrs)
     |> Repo.insert()
+  end
+
+  defp init_attrs(id) do
+    %{"wavelet" => id, "heat" => 0, "love" => 0, "wacky" => 0, "mood" => 0}
   end
 
   @doc """
