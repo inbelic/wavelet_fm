@@ -78,14 +78,17 @@ defmodule WaveletFMWeb.Host do
   
   def handle_event("search", %{"wavelet" => wavelet_params}, socket) do
     %{"title" => title, "artist" => artist} = wavelet_params
-    search_wavelets =
+    {:ok, spotify, search_wavelets} =
       Spotify.track_search(socket.assigns.spotify, title, artist)
-      |> Enum.with_index(fn element, index -> {index, element} end)
+
+    search_wavelets =
+      Enum.with_index(search_wavelets, fn element, index -> {index, element} end)
 
     changeset = Wavelets.change_wavelet(%Wavelet{}, wavelet_params |> default_attrs)
     socket =
       socket
       |> assign(search_wavelets: search_wavelets)
+      |> assign(spotify: spotify)
       |> assign_form(changeset)
     {:noreply, socket}
   end

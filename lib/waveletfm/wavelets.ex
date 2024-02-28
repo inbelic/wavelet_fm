@@ -76,7 +76,8 @@ defmodule WaveletFM.Wavelets do
     query =
       from wavelet in Wavelet,
         where: wavelet.id in ^wavelet_ids,
-        select: wavelet
+        select: wavelet,
+        order_by: fragment("array_position(?, id)", ^wavelet_ids)
 
     Repo.all(query)
   end
