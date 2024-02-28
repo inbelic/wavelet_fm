@@ -17,6 +17,50 @@
     font-style: bold;
 }
 
+.header {
+    height: 7.5vh;
+    background-color: white;
+    color: white;
+    text-align: center;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid black;
+}
+
+.logo {
+    align-items: center;
+    height: 5vh;
+    width: auto;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.profile-icon {
+    width: 30px; /* Set width */
+    height: 30px; /* Set height */
+    border-radius: 50%; /* Create a circular shape */
+}
+
+.footer {
+    background-color: white; /* Background color */
+    border-top: 2px solid black;
+    bottom: 0;
+}
+
+.footer-icons {
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Evenly space items */
+    padding: 10px 20px; /* Add padding for better appearance */
+    width: 60%;
+    margin: 0 20%;
+}
+
 .wavelets-container {
     align-items: center;
 }
