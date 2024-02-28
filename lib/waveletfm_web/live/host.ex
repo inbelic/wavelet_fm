@@ -8,10 +8,13 @@ defmodule WaveletFMWeb.Host do
   alias WaveletFM.Posts
   alias WaveletFM.FMs
 
-  alias External.GenWavelets
+  alias External.Spotify
 
   def mount(_params, _session, socket) do
-    socket = socket |> assign(check_errors: false)
+    socket =
+      socket
+      |> assign(check_errors: false)
+      |> assign(spotify: %Spotify{})
 
     {:ok, socket, temporary_assigns: [form: nil]}
   end
@@ -76,7 +79,7 @@ defmodule WaveletFMWeb.Host do
   def handle_event("search", %{"wavelet" => wavelet_params}, socket) do
     %{"title" => title, "artist" => artist} = wavelet_params
     search_wavelets =
-      GenWavelets.gen_search(title, artist)
+      Spotify.track_search(socket.assigns.spotify, title, artist)
       |> Enum.with_index(fn element, index -> {index, element} end)
 
     changeset = Wavelets.change_wavelet(%Wavelet{}, wavelet_params |> default_attrs)

@@ -35,3 +35,5 @@ waveletfm-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Store application secrets in .env
+.env

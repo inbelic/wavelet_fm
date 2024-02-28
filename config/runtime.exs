@@ -20,6 +20,11 @@ if System.get_env("PHX_SERVER") do
   config :waveletfm, WaveletFMWeb.Endpoint, server: true
 end
 
+config :waveletfm,
+  spotify_client_id: System.get_env("SPOTIFY_CLIENT_ID", nil),
+  spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET", nil)
+
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
