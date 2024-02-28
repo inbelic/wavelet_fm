@@ -20,8 +20,7 @@ defmodule WaveletFMWeb.Router do
   scope "/", WaveletFMWeb do
     pipe_through :browser
 
-    live "/", Host
-    live "/host", Host
+    get "/", PageController, :home
   end
 
   # Other scopes may use custom stacks.
