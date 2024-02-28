@@ -6,6 +6,8 @@ defmodule WaveletFM.Wavelets do
   import Ecto.Query, warn: false
   alias WaveletFM.Repo
 
+  alias WaveletFM.FMs.FM
+  alias WaveletFM.Posts
   alias WaveletFM.Wavelets.Wavelet
 
   @doc """
@@ -46,6 +48,34 @@ defmodule WaveletFM.Wavelets do
       :crypto.hash(:md5, title <> artist)
       |> Base.encode64
       |> get_wavelet!()
+  end
+
+  @doc """
+  Gets all current wavelets extracted from the posts associated to the fm.
+
+  Raises `Ecto.NoResultsError` if the Post does not exist.
+
+  ## Examples
+
+      iex> get_wavelets_by_fm(fm)
+      [%Wavelet{}]
+
+      iex> get_wavelets_by_fm(fm)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_wavelets_by_fm(%FM{} = fm) do
+    wavelet_ids =
+      fm
+      |> Posts.get_posts_by_fm()
+      |> Enum.map(fn post -> post.wavelet end)
+
+    query =
+      from wavelet in Wavelet,
+        where: wavelet.id in ^wavelet_ids,
+        select: wavelet
+
+    Repo.all(query)
   end
 
   @doc """

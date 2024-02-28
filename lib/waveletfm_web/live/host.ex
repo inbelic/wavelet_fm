@@ -24,7 +24,7 @@ defmodule WaveletFMWeb.Host do
     wavelets =
       socket.assigns.current_user
       |> FMs.get_fm_by_user()
-      |> Posts.get_posts_by_fm()
+      |> Wavelets.get_wavelets_by_fm()
       |> append_empty()
       |> Enum.with_index(fn element, index -> {index, element} end)
 
@@ -82,7 +82,7 @@ defmodule WaveletFMWeb.Host do
   end
 
   defp empty_wavelet() do
-    %Wavelet{id: "", title: "Not Selected", artist: "", cover: "", links: []}
+    %Wavelet{id: nil, title: "Not Selected", artist: "", cover: "", links: []}
   end
 
   defp append_empty(list) do

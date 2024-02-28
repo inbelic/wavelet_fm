@@ -6,8 +6,8 @@ defmodule WaveletFM.Posts do
   import Ecto.Query, warn: false
   alias WaveletFM.Repo
 
-  alias WaveletFM.Posts.Post
   alias WaveletFM.FMs.FM
+  alias WaveletFM.Posts.Post
 
   @doc """
   Returns the list of post.
@@ -45,10 +45,10 @@ defmodule WaveletFM.Posts do
 
   ## Examples
 
-      iex> get_post_by_fm(fm)
-      %Post{}
+      iex> get_posts_by_fm(fm)
+      [%Post{}]
 
-      iex> get_post_by_fm(fm)
+      iex> get_posts_by_fm(fm)
       ** (Ecto.NoResultsError)
 
   """
