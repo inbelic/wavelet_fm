@@ -1,4 +1,4 @@
-<header class="header">
+<header class="header font-brand">
   <div class="logo-container">
     <a href={~p"/"} class="">
       <img src="/images/wavelet.png" alt="Logo" class="logo" />
@@ -7,28 +7,69 @@
       <h1 class="text-black font-brand font-bold text-3xl">WaveletFM</h1>
     </a>
   </div>
-  <div class="profile-icon">
-    <%= if @current_user do %>
-      <%= if @current_fm.profiled do %>
-        <% img_src = "/uploads/" <> @current_fm.id %>
-        <a href={~p"/users/settings"} class="">
-          <div class="profile-img-container">
-            <img src={img_src} alt="Profile Picture" class="profile-img" />
-          </div>
-        </a>
-      <% else %>
-        <a href={~p"/users/settings"} class="hover:text-fmDark-light">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="w-100 h-100">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-          </svg>
-        </a>
-      <% end %>
+  <button type="button" id="user-menu-button"
+      phx-click={JS.toggle(to: "#dropdown_menu")}>
+    <%= if @current_user && @current_fm.profiled do %>
+      <% img_src = "/uploads/" <> @current_fm.id %>
+      <div class="profile-img-container">
+        <img src={img_src} alt="Profile Picture" class="profile-img" />
+      </div>
     <% else %>
-      <a href={~p"/users/log_in"} class="hover:text-fmDark-light">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="w-100% h-100%">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-        </svg>
-      </a>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="w-16 h-16">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+      </svg>
+    <% end %>
+  </button>
+  <div id="dropdown_menu" hidden="true" class="dropdown"
+    phx-click-away={JS.toggle(to: "#dropdown_menu")}
+  >
+    <%= if @current_user do %>
+      <.link
+         href={~p"/host"}
+         class="menu-item border-b border-black border-oppacity-50"
+         role="menuitem"
+         tabindex="-1"
+         method="get"
+         id="user-menu-item-1">
+         Your FM
+      </.link>
+      <.link
+         href={~p"/users/settings"}
+         class="menu-item border-b border-black border-oppacity-50"
+         role="menuitem"
+         tabindex="-1"
+         method="get"
+         id="user-menu-item-0">
+         Settings
+      </.link>
+      <.link
+         href={~p"/users/log_out"}
+         class="menu-item"
+         role="menuitem"
+         tabindex="-1"
+         method="delete"
+         id="user-menu-item-2">
+         Sign Out
+      </.link>
+    <% else %>
+      <.link
+         href={~p"/users/log_in"}
+         class="menu-item border-b border-black border-oppacity-50"
+         role="menuitem"
+         tabindex="-1"
+         method="get"
+         id="user-menu-item-0">
+         Sign In
+      </.link>
+      <.link
+         href={~p"/users/register"}
+         class="menu-item"
+         role="menuitem"
+         tabindex="-1"
+         method="get"
+         id="user-menu-item-1">
+         Register
+      </.link>
     <% end %>
   </div>
 </header>

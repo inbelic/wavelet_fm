@@ -45,11 +45,11 @@
     width: 100%;
     height: auto;
     display: block;
-    margin: auto; /* Center the image horizontally */
-    position: absolute; /* Position the image absolutely */
-    top: 50%; /* Move the top edge of the image to the center */
-    left: 50%; /* Move the left edge of the image to the center */
-    transform: translate(-50%, -50%); /* Center the image vertically and horizontally */
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .profile-img-container {
@@ -61,17 +61,42 @@
     border: 2px solid black;
 }
 
+.dropdown {
+    position: absolute;
+    width: min(200px, 50%);
+    height: auto;
+    border: 2px solid black;
+    border-radius: 10px;
+    right: 5%;
+    top: 9vh;
+    background-color: white;
+}
+
+.menu-item {
+    padding: 4 2 4 2;
+    color: black;
+    display: block;
+    margin-bottom: 0.5vh;
+    width: 80%;
+    margin: 0 10%;
+    font-size: x-large;
+}
+
+.menu-item:hover {
+    color: #c0c0c0;
+}
+
 .footer {
-    background-color: white; /* Background color */
+    background-color: white;
     border-top: 2px solid black;
     bottom: 0;
     height: 10vh;
 }
 
 .footer-icons {
-    display: flex; /* Use flexbox for layout */
-    justify-content: space-between; /* Evenly space items */
-    padding: 10px 20px; /* Add padding for better appearance */
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
     width: 60%;
     margin: 0 20%;
 }
