@@ -50,7 +50,7 @@ defmodule WaveletFM.Accounts.UserFM do
     |> cast(attrs, [:freq, :username, :email, :password])
     |> validate_required([:freq, :username])
     |> FM.validate_freq()
-    |> FM.validate_username()
+    |> FM.validate_username([{:validate_fm, false} | opts])
     |> User.validate_email(opts)
     |> validate_password(opts)
   end
