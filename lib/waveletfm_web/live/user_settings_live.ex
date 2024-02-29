@@ -2,15 +2,40 @@ defmodule WaveletFMWeb.UserSettingsLive do
   use WaveletFMWeb, :live_view
 
   alias WaveletFM.Accounts
+  alias WaveletFM.FMs
 
   def render(assigns) do
     ~H"""
     <.header class="text-center">
       Account Settings
-      <:subtitle>Manage your account email address and password settings</:subtitle>
+      <:subtitle>Manage your account settings</:subtitle>
     </.header>
 
     <div class="space-y-12 divide-y">
+      <div>
+        <.simple_form
+          for={@fm_form}
+          id="fm_form"
+          phx-submit="update_fm"
+          phx-change="validate_fm"
+        >
+          <.input field={@fm_form[:freq]} type="number" label="FM Frequency" step="0.1" required />
+          <.input field={@fm_form[:username]} type="text" label="FM Username" required />
+          <.input
+            field={@fm_form[:current_password]}
+            name="current_password"
+            id="current_password_for_email"
+            type="password"
+            label="Current password"
+            value={@fm_form_current_password}
+            required
+          />
+
+          <:actions>
+            <.button phx-disable-with="Changing...">Change FM</.button>
+          </:actions>
+        </.simple_form>
+      </div>
       <div>
         <.simple_form
           for={@email_form}
@@ -91,6 +116,9 @@ defmodule WaveletFMWeb.UserSettingsLive do
     email_changeset = Accounts.change_user_email(user)
     password_changeset = Accounts.change_user_password(user)
 
+    fm = user |> FMs.get_fm_by_user()
+    fm_changeset = FMs.change_fm(fm)
+
     socket =
       socket
       |> assign(:current_password, nil)
@@ -99,6 +127,8 @@ defmodule WaveletFMWeb.UserSettingsLive do
       |> assign(:email_form, to_form(email_changeset))
       |> assign(:password_form, to_form(password_changeset))
       |> assign(:trigger_submit, false)
+      |> assign(:fm_form, to_form(fm_changeset))
+      |> assign(:fm_form_current_password, nil)
 
     {:ok, socket}
   end
@@ -162,6 +192,34 @@ defmodule WaveletFMWeb.UserSettingsLive do
 
       {:error, changeset} ->
         {:noreply, assign(socket, password_form: to_form(changeset))}
+    end
+  end
+
+  def handle_event("validate_fm", params, socket) do
+    %{"current_password" => password, "fm" => fm_params} = params
+
+    fm = socket.assigns.current_user |> FMs.get_fm_by_user()
+    fm_form =
+      fm
+      |> FMs.change_fm(fm_params, validate_fm: false)
+      |> Map.put(:action, :validate)
+      |> to_form()
+
+    {:noreply, assign(socket, fm_form: fm_form, fm_form_current_password: password)}
+  end
+
+  def handle_event("update_fm", params, socket) do
+    %{"current_password" => password, "fm" => fm_params} = params
+    user = socket.assigns.current_user
+    fm = user |> FMs.get_fm_by_user()
+
+    case FMs.update_fm(fm, user, password, fm_params) do
+      {:ok, _fm} ->
+        info = "FM successfully updated."
+        {:noreply, socket |> put_flash(:info, info) |> assign(fm_form_current_password: nil)}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, :fm_form, to_form(Map.put(changeset, :action, :insert)))}
     end
   end
 end

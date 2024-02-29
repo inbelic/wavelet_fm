@@ -4,6 +4,7 @@ defmodule WaveletFM.FMs do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset
   alias WaveletFM.Repo
 
   alias WaveletFM.FMs.FM
@@ -91,10 +92,13 @@ defmodule WaveletFM.FMs do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_fm(%FM{} = fm, attrs) do
-    fm
-    |> FM.changeset(attrs)
-    |> Repo.update()
+  def update_fm(%FM{} = fm, user, password, attrs) do
+    changeset = fm |> FM.changeset(attrs)
+    if User.valid_password?(user, password) do
+      changeset |> Repo.update()
+    else
+      add_error(changeset, :current_password, "is not valid")
+    end
   end
 
   @doc """
@@ -122,7 +126,7 @@ defmodule WaveletFM.FMs do
       %Ecto.Changeset{data: %FM{}}
 
   """
-  def change_fm(%FM{} = fm, attrs \\ %{}) do
-    FM.changeset(fm, attrs)
+  def change_fm(%FM{} = fm, attrs \\ %{}, opts \\ []) do
+    FM.changeset(fm, attrs, opts)
   end
 end

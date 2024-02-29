@@ -1,5 +1,6 @@
 defmodule WaveletFM.Accounts.UserFM do
   alias WaveletFM.Accounts.{User, UserFM}
+  alias WaveletFM.FMs.FM
   
   use Ecto.Schema
   import Ecto.Changeset
@@ -48,41 +49,10 @@ defmodule WaveletFM.Accounts.UserFM do
     user_fm
     |> cast(attrs, [:freq, :username, :email, :password])
     |> validate_required([:freq, :username])
-    |> validate_freq()
-    |> validate_username()
+    |> FM.validate_freq()
+    |> FM.validate_username()
     |> User.validate_email(opts)
     |> validate_password(opts)
-  end
-
-  defp validate_freq(changeset) do
-    changeset
-    |> validate_number(:freq, greater_than_or_equal_to: 88.1, less_than_or_equal_to: 107.9,
-      message: "frequency needs to be between 88.1 and 107.9")
-    |> validate_decimal()
-  end
-
-  defp validate_decimal(changeset) do
-    case get_field(changeset, :freq) do
-      nil -> changeset
-      number -> number
-      |> Kernel.*(10)
-      |> Kernel.trunc()
-      |> Kernel.rem(10)
-      |> is_member?([1,3,5,7,9])
-      |> case do
-        :true -> changeset
-        :false -> add_error(changeset, :freq, "decimal value must be 1, 3, 5, 7 or 9")
-      end
-    end
-  end
-
-  defp is_member?(elem, list) do
-    Enum.member?(list, elem)
-  end
-
-  defp validate_username(changeset) do
-    changeset
-    |> validate_format(:username, ~r/[a-z\.]$/, message: "must only be lowercase letters and .")
   end
 
   def validate_password(changeset, opts) do
