@@ -5,6 +5,7 @@ defmodule WaveletFM.Repo.Migrations.CreateFms do
     create table(:fms, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :freq, :float
+      add :profiled, :boolean
       add :username, :string
       add :user_id, references(:users, on_delete: :delete_all, type: :binary_id)
 

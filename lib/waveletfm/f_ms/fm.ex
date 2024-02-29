@@ -7,6 +7,7 @@ defmodule WaveletFM.FMs.FM do
   schema "fms" do
     field :username, :string
     field :freq, :float
+    field :profiled, :boolean # denotes if a user has a profile picture, id is used for file name
     belongs_to :user, WaveletFM.Accounts.User
     has_many :posts, WaveletFM.Posts.Post
 
@@ -16,7 +17,7 @@ defmodule WaveletFM.FMs.FM do
   @doc false
   def changeset(fm, attrs, opts \\ []) do
     fm
-    |> cast(attrs, [:freq, :username])
+    |> cast(attrs, [:freq, :username, :profiled])
     |> validate_required([:freq, :username])
     |> validate_freq()
     |> validate_username(opts)

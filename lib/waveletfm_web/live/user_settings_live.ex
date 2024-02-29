@@ -21,6 +21,14 @@ defmodule WaveletFMWeb.UserSettingsLive do
         >
           <.input field={@fm_form[:freq]} type="number" label="FM Frequency" step="0.1" required />
           <.input field={@fm_form[:username]} type="text" label="FM Username" required />
+          <label class="block text-sm font-semibold leading-6 text-zinc-800">
+            Profile Picture
+          </label>
+          <div style="margin-top: 0" phx-drop-target={@uploads.profile.ref}>
+            <.live_file_input upload={@uploads.profile} />
+          </div>
+          <.input field={@fm_form[:rmv_profile]} type="checkbox" label="Remove Profile Picture" />
+
           <.input
             field={@fm_form[:current_password]}
             name="current_password"
@@ -129,6 +137,8 @@ defmodule WaveletFMWeb.UserSettingsLive do
       |> assign(:trigger_submit, false)
       |> assign(:fm_form, to_form(fm_changeset))
       |> assign(:fm_form_current_password, nil)
+      |> assign(:uploaded_files, [])
+      |> allow_upload(:profile, accept: ~w(.jpg .jpeg .png), max_entries: 1)
 
     {:ok, socket}
   end
@@ -212,6 +222,22 @@ defmodule WaveletFMWeb.UserSettingsLive do
     %{"current_password" => password, "fm" => fm_params} = params
     user = socket.assigns.current_user
     fm = user |> FMs.get_fm_by_user()
+    dest = Path.join(Application.app_dir(:waveletfm, "priv/static/uploads"), fm.id)
+
+    uploaded_files =
+      consume_uploaded_entries(socket, :profile, fn %{path: path}, _entry ->
+        File.cp!(path, dest)
+        {:ok, ~p"/uploads/#{Path.basename(dest)}"}
+      end)
+
+    fm_params =
+      case get_action(uploaded_files, fm_params["rmv_profile"]) do
+        :non -> fm_params
+        :rmv ->
+          File.rm(dest)
+          Map.put(fm_params, "profiled", false)
+        :add -> Map.put(fm_params, "profiled", true)
+      end
 
     case FMs.update_fm(fm, user, password, fm_params) do
       {:ok, _fm} ->
@@ -221,5 +247,17 @@ defmodule WaveletFMWeb.UserSettingsLive do
       {:error, changeset} ->
         {:noreply, assign(socket, :fm_form, to_form(Map.put(changeset, :action, :insert)))}
     end
+  end
+
+  defp get_action([], "true") do
+    :rmv # no uploaded photo and request to remove profile pic
+  end
+
+  defp get_action([], "false") do
+    :non # no uploaded photo and no request to remove profile pic
+  end
+
+  defp get_action(_, _) do
+    :add # uploaded photo so will replace the existing wheter rmv_profile is selected or not
   end
 end
