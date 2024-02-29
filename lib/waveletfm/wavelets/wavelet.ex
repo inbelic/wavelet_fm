@@ -19,4 +19,10 @@ defmodule WaveletFM.Wavelets.Wavelet do
     |> unsafe_validate_unique(:id, WaveletFM.Repo)
     |> unique_constraint(:id)
   end
+
+  @doc false
+  def search_changeset(wavelet, attrs) do
+    wavelet
+    |> cast(attrs, [:title, :artist])
+  end
 end

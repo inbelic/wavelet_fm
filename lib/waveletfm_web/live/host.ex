@@ -69,7 +69,7 @@ defmodule WaveletFMWeb.Host do
   end
 
   def handle_event("validate", %{"wavelet" => wavelet_params}, socket) do
-    changeset = Wavelets.change_wavelet(%Wavelet{}, wavelet_params |> default_attrs)
+    changeset = Wavelets.change_search_wavelet(%Wavelet{}, wavelet_params |> default_attrs)
     {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end
   
@@ -81,7 +81,7 @@ defmodule WaveletFMWeb.Host do
     search_wavelets =
       Enum.with_index(search_wavelets, fn element, index -> {index, element} end)
 
-    changeset = Wavelets.change_wavelet(%Wavelet{}, wavelet_params |> default_attrs)
+    changeset = Wavelets.change_search_wavelet(%Wavelet{}, wavelet_params |> default_attrs)
     socket =
       socket
       |> assign(search_wavelets: search_wavelets)

@@ -49,7 +49,11 @@ defmodule External.Spotify do
     url = 'https://api.spotify.com/v1/search?q='
     query =
       URI.encode(title)
-      <> "artist%3"
+      <> "%20"
+      <> URI.encode(artist)
+      <> "%2520track%3A"
+      <> URI.encode(title)
+      <> "%2520artist%3A"
       <> URI.encode(artist)
       <> "&type=track"
       <> "&limit=25"

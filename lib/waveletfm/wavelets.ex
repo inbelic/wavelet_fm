@@ -161,6 +161,19 @@ defmodule WaveletFM.Wavelets do
     Wavelet.changeset(wavelet, insert_id(attrs))
   end
 
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking wavelet changes when searching
+
+  ## Examples
+
+      iex> change_search_wavelet(wavelet)
+      %Ecto.Changeset{data: %Wavelet{}}
+
+  """
+  def change_search_wavelet(%Wavelet{} = wavelet, attrs \\ %{}) do
+    Wavelet.search_changeset(wavelet, insert_id(attrs))
+  end
+
   defp insert_id(%Wavelet{:title => title, :artist => artist} = wavelet) do
     %Wavelet{wavelet | id: insert_id_helper(title, artist)}
   end
