@@ -37,3 +37,6 @@ npm-debug.log
 
 # Store application secrets in .env
 .env
+
+# Do not upload any personal uploads
+/priv/static/uploads/*
