@@ -109,7 +109,8 @@ defmodule WaveletFMWeb.Host do
   end
 
   defp empty_wavelet() do
-    %Wavelet{id: nil, title: "Not Selected", artist: "", cover: "", links: []}
+    %Wavelet{id: nil, title: "Not Selected", artist: "",
+      cover: ~p"/images/empty_wavelet.svg", links: []}
   end
 
   defp append_empties(list, num) when num <= length(list) do
