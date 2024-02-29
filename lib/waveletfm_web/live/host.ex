@@ -23,8 +23,7 @@ defmodule WaveletFMWeb.Host do
     changeset = Wavelets.change_wavelet(%Wavelet{})
 
     wavelets =
-      socket.assigns.current_user
-      |> FMs.get_fm_by_user()
+      socket.assigns.current_fm
       |> Wavelets.get_wavelets_by_fm()
       |> append_empties(5)
       |> Enum.with_index(fn element, index -> {index, element} end)
@@ -47,11 +46,9 @@ defmodule WaveletFMWeb.Host do
         # Determine the wavelet that will be replaced from the users fm
         {_, replace_wavelet} = Enum.at(socket.assigns.wavelets, wid)
 
-        current_fm = socket.assigns.current_user |> FMs.get_fm_by_user()
-
         # If the wavelet is not an empty one, then delete the parent post
         {:ok, _} =
-          current_fm
+          socket.assigns.current_fm
           |> Posts.get_posts_by_fm()
           |> Enum.find(fn post ->
             post.wavelet == replace_wavelet.id
@@ -65,7 +62,7 @@ defmodule WaveletFMWeb.Host do
         # values
         {_, searched_wavelet} = Enum.at(socket.assigns.search_wavelets, cur_wid)
         {:ok, wavelet} = Wavelets.create_wavelet(searched_wavelet)
-        Posts.create_post(current_fm, wavelet)
+        Posts.create_post(socket.assigns.current_fm, wavelet)
 
         {:noreply, push_patch(socket, to: ~p"/host")}
     end
