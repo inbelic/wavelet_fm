@@ -6,7 +6,6 @@ defmodule WaveletFMWeb.Host do
   alias WaveletFMWeb.Components.HostWaveletsComponent
 
   alias WaveletFM.Posts
-  alias WaveletFM.FMs
 
   alias External.Spotify
 
@@ -69,7 +68,7 @@ defmodule WaveletFMWeb.Host do
   end
 
   def handle_event("validate", %{"wavelet" => wavelet_params}, socket) do
-    changeset = Wavelets.change_search_wavelet(%Wavelet{}, wavelet_params |> default_attrs)
+    changeset = Wavelets.change_search_wavelet(%Wavelet{}, wavelet_params)
     {:noreply, assign_form(socket, Map.put(changeset, :action, :validate))}
   end
   
@@ -81,7 +80,7 @@ defmodule WaveletFMWeb.Host do
     search_wavelets =
       Enum.with_index(search_wavelets, fn element, index -> {index, element} end)
 
-    changeset = Wavelets.change_search_wavelet(%Wavelet{}, wavelet_params |> default_attrs)
+    changeset = Wavelets.change_search_wavelet(%Wavelet{}, wavelet_params)
     socket =
       socket
       |> assign(search_wavelets: search_wavelets)
@@ -100,12 +99,6 @@ defmodule WaveletFMWeb.Host do
     else
       assign(socket, form: form)
     end
-  end
-
-  defp default_attrs(attrs) do
-    attrs
-    |> Map.put_new("cover", "")
-    |> Map.put_new("links", [])
   end
 
   defp empty_wavelet() do
