@@ -7,6 +7,7 @@ defmodule WaveletFM.Accounts do
   alias WaveletFM.Repo
 
   alias WaveletFM.Accounts.{User, UserFM, UserToken, UserNotifier}
+  alias WaveletFM.FMs
 
   ## Database getters
 
@@ -75,9 +76,21 @@ defmodule WaveletFM.Accounts do
 
   """
   def register_user(attrs) do
-    %User{}
-    |> UserFM.registration_changeset(attrs)
-    |> Repo.insert()
+    Repo.transaction(fn ->
+      %User{}
+      |> UserFM.registration_changeset(attrs)
+      |> Repo.insert()
+      |> case do
+        {:error, %Ecto.Changeset{} = changeset} -> Repo.rollback(changeset)
+        {:ok, user} ->
+          user
+          |> FMs.create_fm(attrs)
+          |> case do
+            {:ok, fm} -> {user, fm}
+            {:error, %Ecto.Changeset{} = changeset} -> Repo.rollback(changeset)
+          end
+      end
+    end)
   end
 
   @doc """

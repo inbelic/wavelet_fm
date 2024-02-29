@@ -64,5 +64,4 @@ defmodule WaveletFM.FMs.FM do
       changeset
     end
   end
-
 end
