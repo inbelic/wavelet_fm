@@ -108,7 +108,7 @@ defmodule WaveletFM.Wavelets do
         |> case do
           [] -> {:ok, found_wavelet}
           new_links ->
-            attrs = %{links: [found_wavelet.links ++ new_links]}
+            attrs = %{"links" => found_wavelet.links ++ new_links}
             update_wavelet(found_wavelet, attrs)
         end
     end
