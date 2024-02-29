@@ -18,7 +18,7 @@
 }
 
 .header {
-    height: 7.5vh;
+    height: 10vh;
     background-color: white;
     color: white;
     text-align: center;
@@ -31,7 +31,7 @@
 
 .logo {
     align-items: center;
-    height: 5vh;
+    height: 7.5vh;
     width: auto;
 }
 
@@ -41,16 +41,31 @@
     justify-content: space-between;
 }
 
-.profile-icon {
-    width: 30px; /* Set width */
-    height: 30px; /* Set height */
-    border-radius: 50%; /* Create a circular shape */
+.profile-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin: auto; /* Center the image horizontally */
+    position: absolute; /* Position the image absolutely */
+    top: 50%; /* Move the top edge of the image to the center */
+    left: 50%; /* Move the left edge of the image to the center */
+    transform: translate(-50%, -50%); /* Center the image vertically and horizontally */
+}
+
+.profile-img-container {
+    width: 7.5vh;
+    height: 7.5vh;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid black;
 }
 
 .footer {
     background-color: white; /* Background color */
     border-top: 2px solid black;
     bottom: 0;
+    height: 10vh;
 }
 
 .footer-icons {
