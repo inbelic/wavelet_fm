@@ -5,6 +5,7 @@ defmodule WaveletFMWeb.UserAuth do
   import Phoenix.Controller
 
   alias WaveletFM.Accounts
+  alias WaveletFM.FMs
 
   # Make the remember me cookie valid for 60 days.
   # If you want bump or reduce this value, also change
@@ -109,6 +110,19 @@ defmodule WaveletFMWeb.UserAuth do
   end
 
   @doc """
+  If a valid user was authenticated then we can also attempt to fetch the
+  corresponding current_fm into the connection.
+  """
+  def fetch_current_fm(conn, _opts) do
+    case conn.assigns[:current_user] do
+      nil -> conn
+      user ->
+        fm = user |> FMs.get_fm_by_user()
+        assign(conn, :current_fm, fm)
+    end
+  end
+
+  @doc """
   Handles mounting and authenticating the current_user in LiveViews.
 
   ## `on_mount` arguments
@@ -144,11 +158,11 @@ defmodule WaveletFMWeb.UserAuth do
       end
   """
   def on_mount(:mount_current_user, _params, session, socket) do
-    {:cont, mount_current_user(socket, session)}
+    {:cont, mount_current_user_fm(socket, session)}
   end
 
   def on_mount(:ensure_authenticated, _params, session, socket) do
-    socket = mount_current_user(socket, session)
+    socket = mount_current_user_fm(socket, session)
 
     if socket.assigns.current_user do
       {:cont, socket}
@@ -163,7 +177,7 @@ defmodule WaveletFMWeb.UserAuth do
   end
 
   def on_mount(:redirect_if_user_is_authenticated, _params, session, socket) do
-    socket = mount_current_user(socket, session)
+    socket = mount_current_user_fm(socket, session)
 
     if socket.assigns.current_user do
       {:halt, Phoenix.LiveView.redirect(socket, to: signed_in_path(socket))}
@@ -172,10 +186,22 @@ defmodule WaveletFMWeb.UserAuth do
     end
   end
 
+  defp mount_current_user_fm(socket, session) do
+    socket |> mount_current_user(session) |> mount_current_fm()
+  end
+
   defp mount_current_user(socket, session) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->
       if user_token = session["user_token"] do
         Accounts.get_user_by_session_token(user_token)
+      end
+    end)
+  end
+
+  defp mount_current_fm(socket) do
+    Phoenix.Component.assign_new(socket, :current_fm, fn ->
+      if socket.assigns.current_user do
+        socket.assigns.current_user |> FMs.get_fm_by_user()
       end
     end)
   end
