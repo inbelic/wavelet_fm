@@ -28,6 +28,23 @@ defmodule WaveletFM.FMs do
   end
 
   @doc """
+  Gets a single fm with assocs preloaded.
+
+  ## Examples
+
+      iex> get_fm(123)
+      %FM{}
+
+      iex> get_fm(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_fm(id) do
+    fm = Repo.get(FM, id)
+    Repo.preload fm, [:posts]
+  end
+
+  @doc """
   Gets a single fm.
 
   Raises `Ecto.NoResultsError` if the Fm does not exist.

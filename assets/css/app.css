@@ -160,3 +160,11 @@
     flex: 1;
     flex-direction: column;
 }
+
+.button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    aspect-ratio: 2.5;
+}
