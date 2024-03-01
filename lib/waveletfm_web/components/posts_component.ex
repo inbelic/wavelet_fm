@@ -18,7 +18,19 @@ defmodule WaveletFMWeb.Components.PostsComponent do
         <% wavelet = post.wavelet %>
         <% {f_outline, f_fill} = assign_class(@following, fm.id) %>
         <div class="fm-container">
-          <%= fm.freq %> <%= fm.username %> FM
+        <%= if fm.profiled do %>
+          <% img_src = "/uploads/" <> fm.id %>
+            <div class="profile-img-container-feed">
+              <img src={img_src} alt="Profile Picture" class="profile-img" />
+            </div>
+          <% else %>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="black" class="w-12 h-12">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            </svg>
+          <% end %>
+          <h1 class="ml-2">
+            <%= fm.freq %> <%= fm.username %> FM
+          </h1>
           <%= if @current_fm do %>
             <div class="follow" phx-click="follow" phx-value-fm_id={fm.id}>
               <div class={f_outline}>

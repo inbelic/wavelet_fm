@@ -60,6 +60,15 @@
     border: 2px solid black;
 }
 
+.profile-img-container-feed {
+    width: 6vh;
+    height: 6vh;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid black;
+}
+
 .dropdown {
     position: absolute;
     width: min(200px, 50%);
