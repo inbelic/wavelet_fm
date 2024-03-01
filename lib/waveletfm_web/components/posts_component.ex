@@ -1,8 +1,8 @@
 defmodule WaveletFMWeb.Components.PostsComponent do
   use WaveletFMWeb, :live_component
 
-  def assign_class(following, fm_id) do
-    if Enum.member?(following, fm_id) do
+  def assign_class(fm) do
+    if fm.following do
       {"follow-on", "follow-non"}
     else
       {"follow-non", "follow-on"}
@@ -13,10 +13,10 @@ defmodule WaveletFMWeb.Components.PostsComponent do
     ~H"""
     <div id="fm-feed" phx-update="stream" class="">
       <div :for={{dom_id, fm} <- @fms} :if={fm.id != @current_fm.id} id={dom_id} class="post-container mt-3">
-        <% idx = rem(@indexing[fm.id], Enum.count(fm.posts)) %>
+        <% idx = rem(fm.index, Enum.count(fm.posts)) %>
         <% post = Enum.at(fm.posts, idx) %>
         <% wavelet = post.wavelet %>
-        <% {f_outline, f_fill} = assign_class(@following, fm.id) %>
+        <% {f_outline, f_fill} = assign_class(fm) %>
         <div class="fm-container">
         <%= if fm.profiled do %>
           <% img_src = "/uploads/" <> fm.id %>
