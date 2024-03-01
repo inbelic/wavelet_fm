@@ -12,7 +12,8 @@ defmodule WaveletFMWeb.Components.PostsComponent do
   def render(assigns) do
     ~H"""
     <div id="fm-feed" phx-update="stream" class="">
-      <div :for={{dom_id, fm} <- @fms} :if={fm.id != @current_fm.id} id={dom_id} class="post-container mt-3">
+      <div :for={{dom_id, fm} <- @fms} id={dom_id} class="post-container mt-3"
+        :if={!@current_fm || fm.id != @current_fm.id}>
         <% idx = rem(fm.index, Enum.count(fm.posts)) %>
         <% post = Enum.at(fm.posts, idx) %>
         <% wavelet = post.wavelet %>
