@@ -20,7 +20,11 @@ defmodule WaveletFM.FMs do
 
   """
   def list_fms do
-    Repo.all(FM)
+    query =
+      from fm in FM,
+        select: fm,
+        preload: [:posts]
+    Repo.all(query)
   end
 
   @doc """

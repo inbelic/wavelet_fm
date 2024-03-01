@@ -18,12 +18,6 @@ defmodule WaveletFMWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", WaveletFMWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-  end
-
   # Other scopes may use custom stacks.
   # scope "/api", WaveletFMWeb do
   #   pipe_through :api
@@ -82,6 +76,8 @@ defmodule WaveletFMWeb.Router do
       on_mount: [{WaveletFMWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+      live "/", Explore
+      live "/explore", Explore
     end
   end
 end

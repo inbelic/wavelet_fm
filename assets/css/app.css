@@ -103,9 +103,6 @@
 .fm-container {
     display: flex;
     height: 2rem;
-    border-radius: 10px;
-    border: 2px solid black;
-    overflow: hidden;
 
     align-items: center;
     justify-content: center;
@@ -118,7 +115,7 @@
 
 .wavelet-container {
     display: flex;
-    height: 20%;
+    height: 80%;
     border-radius: 10px;
     border: 2px solid black;
     overflow: hidden;
@@ -128,7 +125,7 @@
     aspect-ratio: 2.5;
 }
 
-.wavelet-container:hover {
+.wavelet-hover:hover {
     background-color: #c0c0c0;
 }
 
@@ -150,4 +147,16 @@
 .wavelet-text {
     flex-basis: calc(25% - 2px);
     height: 25%;
+}
+
+.post-container {
+    display: flex;
+    height: 20%;
+
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 2.5;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
 }

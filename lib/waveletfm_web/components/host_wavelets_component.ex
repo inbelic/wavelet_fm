@@ -5,7 +5,7 @@ defmodule WaveletFMWeb.Components.HostWaveletsComponent do
     ~H"""
     <div>
       <%= for {wid, wavelet} <- @wavelets do %>
-        <div class="wavelet-container"
+        <div class="wavelet-container wavelet-hover"
           phx-click={@js |> JS.push("selected", value: %{wid: wid})}>
           <div class="wavelet-cover">
             <div class="cover-wrapper">
