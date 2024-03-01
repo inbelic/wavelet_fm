@@ -21,6 +21,10 @@ defmodule WaveletFMWeb.Explore do
     {:ok, socket}
   end
 
+  def handle_event("follow", %{"fm_id" => _fm_id}, socket) do
+    {:noreply, socket}
+  end
+
   def handle_event("prev", %{"fm_id" => fm_id}, socket) do
     indexing =
       socket.assigns.indexing

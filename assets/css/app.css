@@ -168,3 +168,23 @@
     height: 100%;
     aspect-ratio: 2.5;
 }
+
+.follow {
+    margin-left: 10px;
+}
+
+.follow:hover .follow-non {
+    display: none;
+}
+
+.follow:hover .follow-on {
+    display: block;
+}
+
+.follow .follow-non {
+    display: block;
+}
+
+.follow .follow-on {
+    display: none;
+}
