@@ -4,11 +4,13 @@ defmodule WaveletFM.Wavelets.Wavelet do
 
   @primary_key {:id, :string, autogenerate: false}
   @foreign_key_type :string
+  @derive {Jason.Encoder, except: [:__meta__, :__struct__, :posts]}
   schema "wavelets" do
     field :links, {:array, :string}
     field :title, :string
     field :cover, :string
     field :artist, :string
+    has_many :posts, WaveletFM.Posts.Post
   end
 
   @doc false

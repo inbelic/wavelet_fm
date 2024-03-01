@@ -10,10 +10,16 @@ defmodule WaveletFMWeb.Host do
   alias External.Spotify
 
   def mount(_params, _session, socket) do
+    wavelets =
+      socket.assigns.current_fm
+      |> Wavelets.get_wavelets_by_fm()
+      |> append_empties(5)
+
     socket =
       socket
       |> assign(check_errors: false)
       |> assign(spotify: %Spotify{})
+      |> stream(:wavelets, wavelets)
 
     {:ok, socket, temporary_assigns: [form: nil]}
   end
@@ -21,29 +27,22 @@ defmodule WaveletFMWeb.Host do
   def handle_params(_params, _uri, socket) do
     changeset = Wavelets.change_wavelet(%Wavelet{})
 
-    wavelets =
-      socket.assigns.current_fm
-      |> Wavelets.get_wavelets_by_fm()
-      |> append_empties(5)
-      |> Enum.with_index(fn element, index -> {index, element} end)
-
     socket =
       socket
-      |> assign(wid: nil)
-      |> assign(wavelets: wavelets)
-      |> assign(search_wavelets: [])
+      |> assign(wavelet: nil)
+      |> stream(:search_wavelets, [], reset: true)
       |> assign_form(changeset)
 
     {:noreply, socket}
   end
   
-  def handle_event("selected", %{"wid" => cur_wid}, socket) do
-    case socket.assigns.wid do
+  def handle_event("selected", %{"wavelet" => json_wavelet}, socket) do
+    case socket.assigns.wavelet do
       nil ->
-        {:noreply, assign(socket, wid: cur_wid)}
-      wid ->
-        # Determine the wavelet that will be replaced from the users fm
-        {_, replace_wavelet} = Enum.at(socket.assigns.wavelets, wid)
+        replace_wavelet = to_wavelet(json_wavelet)
+        {:noreply, assign(socket, wavelet: replace_wavelet)}
+      replace_wavelet ->
+        searched_wavelet = to_wavelet(json_wavelet)
 
         # If the wavelet is not an empty one, then delete the parent post
         {:ok, _} =
@@ -59,9 +58,13 @@ defmodule WaveletFMWeb.Host do
 
         # Create a new post on the users fm with the selected search wavelet
         # values
-        {_, searched_wavelet} = Enum.at(socket.assigns.search_wavelets, cur_wid)
         {:ok, wavelet} = Wavelets.create_wavelet(searched_wavelet)
-        Posts.create_post(socket.assigns.current_fm, wavelet)
+        {:ok, _post} = Posts.create_post(socket.assigns.current_fm, wavelet)
+
+        socket =
+          socket
+          |> stream_delete(:wavelets, replace_wavelet)
+          |> stream_insert(:wavelets, wavelet, at: 0)
 
         {:noreply, push_patch(socket, to: ~p"/host")}
     end
@@ -77,13 +80,10 @@ defmodule WaveletFMWeb.Host do
     {:ok, spotify, search_wavelets} =
       Spotify.track_search(socket.assigns.spotify, title, artist)
 
-    search_wavelets =
-      Enum.with_index(search_wavelets, fn element, index -> {index, element} end)
-
     changeset = Wavelets.change_search_wavelet(%Wavelet{}, wavelet_params)
     socket =
       socket
-      |> assign(search_wavelets: search_wavelets)
+      |> stream(:search_wavelets, search_wavelets, reset: true)
       |> assign(spotify: spotify)
       |> assign_form(changeset)
     {:noreply, socket}
@@ -102,7 +102,7 @@ defmodule WaveletFMWeb.Host do
   end
 
   defp empty_wavelet() do
-    %Wavelet{id: nil, title: "Not Selected", artist: "",
+    %Wavelet{id: "empty", title: "Not Selected", artist: "",
       cover: ~p"/images/empty_wavelet.svg", links: []}
   end
 
@@ -113,5 +113,10 @@ defmodule WaveletFMWeb.Host do
   defp append_empties(list, num) do
     to_take = max(0, num - length(list))
     list ++ Enum.map(1..to_take, fn _ -> empty_wavelet() end)
+  end
+
+  defp to_wavelet(%{"id" => id, "title" => title, "artist" => artist,
+    "cover" => cover, "links" => links}) do
+    %Wavelet{id: id, title: title, artist: artist, cover: cover, links: links}
   end
 end

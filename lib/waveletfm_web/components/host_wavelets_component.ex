@@ -3,10 +3,9 @@ defmodule WaveletFMWeb.Components.HostWaveletsComponent do
 
   def render(assigns) do
     ~H"""
-    <div>
-      <%= for {wid, wavelet} <- @wavelets do %>
-        <div class="wavelet-container wavelet-hover"
-          phx-click={@js |> JS.push("selected", value: %{wid: wid})}>
+    <div id="post-feed" phx-update="stream" class="">
+      <div :for={{dom_id, wavelet} <- @wavelets} id={dom_id} class="wavelet-container wavelet-hover mt-3"
+          phx-click={@js |> JS.push("selected", value: %{wavelet: wavelet})}>
           <div class="wavelet-cover">
             <div class="cover-wrapper">
               <img src={wavelet.cover} alt="Cover Art"/>
@@ -27,7 +26,6 @@ defmodule WaveletFMWeb.Components.HostWaveletsComponent do
         </div>
         <div style="height: 0.7rem">
         </div>
-      <% end %>
     </div>
     """
   end

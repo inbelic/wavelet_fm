@@ -68,18 +68,9 @@ defmodule WaveletFM.Wavelets do
 
   """
   def get_wavelets_by_fm(%FM{} = fm) do
-    wavelet_ids =
-      fm
-      |> Posts.get_posts_by_fm()
-      |> Enum.map(fn post -> post.wavelet end)
-
-    query =
-      from wavelet in Wavelet,
-        where: wavelet.id in ^wavelet_ids,
-        select: wavelet,
-        order_by: fragment("array_position(?, id)", ^wavelet_ids)
-
-    Repo.all(query)
+    fm
+    |> Posts.get_posts_by_fm()
+    |> Enum.map(fn post -> post.wavelet end)
   end
 
   @doc """
@@ -174,15 +165,15 @@ defmodule WaveletFM.Wavelets do
     Wavelet.search_changeset(wavelet, insert_id(attrs))
   end
 
-  defp insert_id(%Wavelet{:title => title, :artist => artist} = wavelet) do
+  def insert_id(%Wavelet{:title => title, :artist => artist} = wavelet) do
     %Wavelet{wavelet | id: insert_id_helper(title, artist)}
   end
 
-  defp insert_id(%{"title" => title, "artist" => artist} = attrs) do
+  def insert_id(%{"title" => title, "artist" => artist} = attrs) do
     Map.put(attrs, "id", insert_id_helper(title, artist))
   end
 
-  defp insert_id(attrs) do
+  def insert_id(attrs) do
     attrs
   end
 

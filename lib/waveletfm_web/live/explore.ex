@@ -26,7 +26,7 @@ defmodule WaveletFMWeb.Explore do
       socket.assigns.indexing
       |> Map.update!(fm_id, fn x -> x - 1 end)
 
-    fm = FMs.get_fm!(fm_id)
+    fm = FMs.get_fm(fm_id)
 
     socket =
       socket

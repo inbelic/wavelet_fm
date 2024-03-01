@@ -60,6 +60,7 @@ defmodule WaveletFM.Posts do
         where: fm.id == ^fm.id,
         select: post,
         order_by: [desc: :inserted_at],
+        preload: :wavelet,
         limit: 5
 
     Repo.all(query)
@@ -78,16 +79,15 @@ defmodule WaveletFM.Posts do
 
   """
   def create_post(%FM{} = fm, %Wavelet{} = wavelet) do
-    attrs = init_attrs(wavelet.id)
+    attrs = init_attrs()
 
-    fm
-    |> Ecto.build_assoc(:posts)
+    %Post{fm_id: fm.id, wavelet_id: wavelet.id}
     |> Post.changeset(attrs)
     |> Repo.insert()
   end
 
-  defp init_attrs(id) do
-    %{"wavelet" => id, "heat" => 0, "love" => 0, "wacky" => 0, "mood" => 0}
+  defp init_attrs() do
+    %{"heat" => 0, "love" => 0, "wacky" => 0, "mood" => 0}
   end
 
   @doc """

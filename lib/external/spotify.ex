@@ -1,6 +1,7 @@
 defmodule External.Spotify do
 
   alias External.Spotify # To use the struct
+  alias WaveletFM.Wavelets
   alias WaveletFM.Wavelets.Wavelet
   alias HTTPoison.Response
 
@@ -87,6 +88,7 @@ defmodule External.Spotify do
       "album" => %{"images" => [%{"url" => cover}|_]}} = item
     [artist | _] = Enum.map(artist_objs, fn obj -> obj["name"] end)
     link = "http://open.spotify.com/track/" <> track_id
-    %Wavelet{title: title, artist: artist, cover: cover, links: [link]}
+    Wavelets.insert_id(
+      %Wavelet{title: title, artist: artist, cover: cover, links: [link]})
   end
 end

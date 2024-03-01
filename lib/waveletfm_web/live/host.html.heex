@@ -6,7 +6,7 @@
      module = {HostWaveletsComponent}
      id="host-wavelets"
      js={ show_modal("search-modal") }
-     wavelets={@wavelets}
+     wavelets={@streams.wavelets}
   />
   <.modal id="search-modal">
       <.simple_form
@@ -34,7 +34,7 @@
        module = {HostWaveletsComponent}
        id="search-wavelets"
        js={hide_modal("search-modal")}
-       wavelets={@search_wavelets}
+       wavelets={@streams.search_wavelets}
     />
   </.modal>
 </div>
