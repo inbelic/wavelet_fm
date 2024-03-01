@@ -150,4 +150,75 @@ defmodule WaveletFM.FMs do
   def change_fm(%FM{} = fm, attrs \\ %{}, opts \\ []) do
     FM.changeset(fm, attrs, opts)
   end
+
+  alias WaveletFM.FMs.Follow
+
+  @doc """
+  Returns the list of follow.
+
+  ## Examples
+
+      iex> list_follow()
+      [%Follow{}, ...]
+
+  """
+  def list_follow do
+    Repo.all(Follow)
+  end
+
+  @doc """
+  Gets a single follow.
+
+  Raises `Ecto.NoResultsError` if the Follow does not exist.
+
+  ## Examples
+
+      iex> get_follow!(123)
+      %Follow{}
+
+      iex> get_follow!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_follow!(id), do: Repo.get!(Follow, id)
+
+  @doc """
+  Creates a follow.
+
+  ## Examples
+
+      iex> create_follow(%{field: value})
+      {:ok, %Follow{}}
+
+      iex> create_follow(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_follow(%FM{} = to, %FM{} = from) do
+    id = follow_id(to.id, from.id)
+    %Follow{id: id, to: to.id, from: from.id}
+    |> Follow.changeset(%{})
+    |> Repo.insert()
+  end
+
+  @doc """
+  Deletes a follow.
+
+  ## Examples
+
+      iex> delete_follow(follow)
+      {:ok, %Follow{}}
+
+      iex> delete_follow(follow)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_follow(%Follow{} = follow) do
+    Repo.delete(follow)
+  end
+
+  defp follow_id(to_id, from_id) do
+    :crypto.hash(:sha256, to_id <> from_id)
+    |> Base.encode64
+  end
 end

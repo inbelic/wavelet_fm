@@ -19,4 +19,18 @@ defmodule WaveletFM.FMsFixtures do
 
     fm
   end
+
+  @doc """
+  Generate a follow.
+  """
+  def follow_fixture(attrs \\ %{}) do
+    {:ok, follow} =
+      attrs
+      |> Enum.into(%{
+
+      })
+      |> WaveletFM.FMs.create_follow()
+
+    follow
+  end
 end
