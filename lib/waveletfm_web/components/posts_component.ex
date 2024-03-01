@@ -16,7 +16,6 @@ defmodule WaveletFMWeb.Components.PostsComponent do
         <% idx = rem(fm.index, Enum.count(fm.posts)) %>
         <% post = Enum.at(fm.posts, idx) %>
         <% wavelet = post.wavelet %>
-        <% {f_outline, f_fill} = assign_class(fm) %>
         <div class="fm-container">
         <%= if fm.profiled do %>
           <% img_src = "/uploads/" <> fm.id %>
@@ -32,6 +31,7 @@ defmodule WaveletFMWeb.Components.PostsComponent do
             <%= fm.freq %> <%= fm.username %> FM
           </h1>
           <%= if @current_fm && @show_follow == "true" do %>
+            <% {f_outline, f_fill} = assign_class(fm) %>
             <div class="follow" phx-click="follow" phx-value-fm_id={fm.id}>
               <div class={f_outline}>
                 <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="#FF6961" class="w-6 h-6">

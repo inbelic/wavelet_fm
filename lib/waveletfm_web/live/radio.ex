@@ -2,6 +2,7 @@ defmodule WaveletFMWeb.Radio do
   use WaveletFMWeb, :live_view
 
   alias WaveletFM.FMs
+  alias WaveletFM.FMs.FM
   alias WaveletFM.FMs.Follow
   alias WaveletFMWeb.Components.PostsComponent
 
@@ -15,6 +16,10 @@ defmodule WaveletFMWeb.Radio do
       FMs.list_fms()
       |> Enum.filter(fn fm -> Enum.count(fm.posts) > 0 end)
       |> Enum.filter(fn fm -> Enum.member?(following, fm.id) end)
+      |> Enum.map(fn fm ->
+        fm
+        |> Map.put(:index, 0)
+      end)
 
     indexing =
       fms
@@ -23,7 +28,6 @@ defmodule WaveletFMWeb.Radio do
     socket =
       socket
       |> stream(:fms, fms)
-      |> assign(:following, following)
       |> assign(:indexing, indexing)
 
     {:ok, socket}
@@ -34,12 +38,16 @@ defmodule WaveletFMWeb.Radio do
       socket.assigns.indexing
       |> Map.update!(fm_id, fn x -> x - 1 end)
 
-    fm = FMs.get_fm(fm_id)
+    fm =
+      fm_id
+      |> FMs.get_fm()
+      |> set_index(indexing)
 
     socket =
       socket
       |> assign(:indexing, indexing)
       |> stream_insert(:fms, fm)
+
     {:noreply, socket}
   end
 
@@ -48,7 +56,10 @@ defmodule WaveletFMWeb.Radio do
       socket.assigns.indexing
       |> Map.update!(fm_id, fn x -> x + 1 end)
 
-    fm = FMs.get_fm(fm_id)
+    fm =
+      fm_id
+      |> FMs.get_fm()
+      |> set_index(indexing)
 
     socket =
       socket
@@ -56,5 +67,10 @@ defmodule WaveletFMWeb.Radio do
       |> stream_insert(:fms, fm)
 
     {:noreply, socket}
+  end
+
+  defp set_index(%FM{} = fm, indexing) do
+    idx = Map.fetch!(indexing, fm.id)
+    Map.put(fm, :index, idx)
   end
 end
