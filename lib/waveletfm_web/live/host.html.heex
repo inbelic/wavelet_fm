@@ -3,7 +3,7 @@
     Hosting <%= @current_fm.freq %> <%= @current_fm.username %> FM
   </div>
   <.live_component
-     module = {HostWaveletsComponent}
+     module = {StreamWaveletsComponent}
      id="host-wavelets"
      js={ show_modal("search-modal") }
      wavelets={@streams.wavelets}
@@ -31,7 +31,7 @@
     <div style="height: 1rem">
     </div>
     <.live_component
-       module = {HostWaveletsComponent}
+       module = {StreamWaveletsComponent}
        id="search-wavelets"
        js={hide_modal("search-modal")}
        wavelets={@streams.search_wavelets}

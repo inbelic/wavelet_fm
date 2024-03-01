@@ -1,4 +1,4 @@
-defmodule WaveletFMWeb.Components.HostWaveletsComponent do
+defmodule WaveletFMWeb.Components.StreamWaveletsComponent do
   use WaveletFMWeb, :live_component
 
   def render(assigns) do

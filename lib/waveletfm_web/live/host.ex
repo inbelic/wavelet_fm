@@ -3,7 +3,7 @@ defmodule WaveletFMWeb.Host do
 
   alias WaveletFM.Wavelets
   alias WaveletFM.Wavelets.Wavelet
-  alias WaveletFMWeb.Components.HostWaveletsComponent
+  alias WaveletFMWeb.Components.StreamWaveletsComponent
 
   alias WaveletFM.Posts
 
