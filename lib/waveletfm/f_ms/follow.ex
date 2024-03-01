@@ -8,8 +8,6 @@ defmodule WaveletFM.FMs.Follow do
 
     field :from, :binary_id
     field :to, :binary_id
-
-    timestamps(type: :utc_datetime)
   end
 
   @doc false

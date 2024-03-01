@@ -2,6 +2,7 @@ defmodule WaveletFMWeb.Explore do
   use WaveletFMWeb, :live_view
 
   alias WaveletFM.FMs
+  alias WaveletFM.FMs.Follow
   alias WaveletFMWeb.Components.PostsComponent
 
   def mount(_params, _session, socket) do
@@ -13,15 +14,41 @@ defmodule WaveletFMWeb.Explore do
       fms
       |> Enum.reduce(%{}, fn fm, acc -> Map.put(acc, fm.id, 0) end)
 
+    following =
+      socket.assigns.current_fm
+      |> FMs.list_following()
+      |> Enum.map(fn %Follow{} = follow -> follow.to end)
+
     socket =
       socket
       |> stream(:fms, fms)
+      |> assign(:following, following)
       |> assign(:indexing, indexing)
 
     {:ok, socket}
   end
 
-  def handle_event("follow", %{"fm_id" => _fm_id}, socket) do
+  def handle_event("follow", %{"fm_id" => fm_id}, socket) do
+    from_fm = FMs.get_fm(socket.assigns.current_fm.id)
+    to_fm = FMs.get_fm!(fm_id)
+
+    following =
+      FMs.follow_id(from_fm.id, to_fm.id)
+      |> FMs.get_follow()
+      |> case do
+        nil ->
+          {:ok, follow} = FMs.create_follow(from_fm, to_fm)
+          [follow | socket.assigns.following]
+        follow ->
+          {:ok, follow} = FMs.delete_follow(follow)
+          Enum.reject(socket.assigns.following,
+            fn f_id -> f_id == follow.id end)
+      end
+
+    socket =
+      socket
+      |> assign(:following, following)
+
     {:noreply, socket}
   end
 

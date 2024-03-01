@@ -7,8 +7,9 @@ defmodule WaveletFM.FMs do
   import Ecto.Changeset
   alias WaveletFM.Repo
 
-  alias WaveletFM.FMs.FM
   alias WaveletFM.Accounts.User
+  alias WaveletFM.FMs.FM
+  alias WaveletFM.FMs.Follow
 
   @doc """
   Returns the list of fms.
@@ -154,33 +155,42 @@ defmodule WaveletFM.FMs do
   alias WaveletFM.FMs.Follow
 
   @doc """
-  Returns the list of follow.
+  Returns the list of fms that fm is following.
 
   ## Examples
 
-      iex> list_follow()
+      iex> list_following(%FM{} = fm)
       [%Follow{}, ...]
 
   """
-  def list_follow do
-    Repo.all(Follow)
+  def list_following(%FM{} = fm) do
+    query =
+      from follow in Follow,
+        where: [from: ^fm.id],
+        select: follow
+    
+    Repo.all(query)
+  end
+
+  def list_following(nil) do
+    []
   end
 
   @doc """
   Gets a single follow.
 
-  Raises `Ecto.NoResultsError` if the Follow does not exist.
+  Returns nil if the Follow does not exist.
 
   ## Examples
 
-      iex> get_follow!(123)
+      iex> get_follow(123)
       %Follow{}
 
-      iex> get_follow!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_follow(456)
+      nil
 
   """
-  def get_follow!(id), do: Repo.get!(Follow, id)
+  def get_follow(id), do: Repo.get(Follow, id)
 
   @doc """
   Creates a follow.
@@ -194,9 +204,9 @@ defmodule WaveletFM.FMs do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_follow(%FM{} = to, %FM{} = from) do
-    id = follow_id(to.id, from.id)
-    %Follow{id: id, to: to.id, from: from.id}
+  def create_follow(%FM{} = from, %FM{} = to) do
+    id = follow_id(from.id, to.id)
+    %Follow{id: id, from: from.id, to: to.id}
     |> Follow.changeset(%{})
     |> Repo.insert()
   end
@@ -217,8 +227,8 @@ defmodule WaveletFM.FMs do
     Repo.delete(follow)
   end
 
-  defp follow_id(to_id, from_id) do
-    :crypto.hash(:sha256, to_id <> from_id)
+  def follow_id(from_id, to_id) do
+    :crypto.hash(:sha256, from_id <> to_id)
     |> Base.encode64
   end
 end
