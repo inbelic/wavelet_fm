@@ -23,7 +23,7 @@ defmodule WaveletFM.FMs do
     query =
       from fm in FM,
         select: fm,
-        preload: [:posts]
+        preload: [posts: [:wavelet]]
     Repo.all(query)
   end
 
@@ -41,7 +41,7 @@ defmodule WaveletFM.FMs do
   """
   def get_fm(id) do
     fm = Repo.get(FM, id)
-    Repo.preload fm, [:posts]
+    Repo.preload fm, posts: [:wavelet]
   end
 
   @doc """
