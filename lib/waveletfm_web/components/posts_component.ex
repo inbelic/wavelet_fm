@@ -19,7 +19,7 @@ defmodule WaveletFMWeb.Components.PostsComponent do
         <div class="fm-container">
         <%= if fm.profiled do %>
           <% img_src = "/uploads/" <> fm.id %>
-            <div class="profile-img-container-feed">
+            <div class="profile-img-container">
               <img src={img_src} alt="Profile Picture" class="profile-img" />
             </div>
           <% else %>

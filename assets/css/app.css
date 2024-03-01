@@ -52,15 +52,6 @@
 }
 
 .profile-img-container {
-    width: 7.5vh;
-    height: 7.5vh;
-    border-radius: 50%;
-    overflow: hidden;
-    position: relative;
-    border: 2px solid black;
-}
-
-.profile-img-container-feed {
     width: 6vh;
     height: 6vh;
     border-radius: 50%;
@@ -196,4 +187,11 @@
 
 .follow .follow-on {
     display: none;
+}
+
+.search {
+    width: 80%;
+    margin: 0 10%;
+    margin-top: -30px;
+    margin-bottom: 20px;
 }

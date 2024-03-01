@@ -370,7 +370,9 @@ defmodule WaveletFMWeb.CoreComponents do
   def input(assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label for={@id}><%= @label %></.label>
+      <%= if @label != "" do %>
+        <.label for={@id}><%= @label %></.label>
+      <% end %>
       <input
         type={@type}
         name={@name}

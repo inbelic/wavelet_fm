@@ -28,6 +28,17 @@ defmodule WaveletFM.FMs do
     Repo.all(query)
   end
 
+  def list_fms(search) do
+    query =
+      from fm in FM,
+        where: ilike(fm.username, ^"%#{search}%"),
+        preload: [posts: [:wavelet]],
+        select: fm
+
+    Repo.all(query)
+  end
+
+
   @doc """
   Gets a single fm with assocs preloaded.
 

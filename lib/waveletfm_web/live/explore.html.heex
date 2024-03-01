@@ -1,4 +1,14 @@
 <div class="mx-auto font-brand">
+  <div class="search">
+    <.simple_form
+      for={@form}
+      id="search_form"
+      phx-change="update"
+      phx-submit="update"
+      >
+      <.input field={@form[:search]} type="text" label="" placeholder="Search for FM..." required />
+    </.simple_form>
+  </div>
   <.live_component
      module = {PostsComponent}
      id="search-fms"

@@ -12,12 +12,22 @@ defmodule WaveletFMWeb.Explore do
       |> FMs.list_following()
       |> Enum.map(fn %Follow{} = follow -> follow.to end)
 
+    socket =
+      socket
+      |> assign(:following, following)
+      |> assign(:form, to_form(%{"search" => ""}))
+      |> assign(:search, "")
+
+    {:ok, socket}
+  end
+
+  def handle_params(_params, _uri, socket) do
     fms =
-      FMs.list_fms()
+      FMs.list_fms(socket.assigns.search)
       |> Enum.filter(fn fm -> Enum.count(fm.posts) > 0 end)
       |> Enum.map(fn fm ->
         fm
-        |> Map.put(:following, Enum.member?(following, fm.id))
+        |> Map.put(:following, Enum.member?(socket.assigns.following, fm.id))
         |> Map.put(:index, 0)
       end)
 
@@ -27,11 +37,20 @@ defmodule WaveletFMWeb.Explore do
 
     socket =
       socket
-      |> stream(:fms, fms)
+      |> stream(:fms, fms, reset: true)
       |> assign(:indexing, indexing)
-      |> assign(:following, following)
 
-    {:ok, socket}
+    {:noreply, socket}
+  end
+
+  def handle_event("update", %{"search" => search}, socket) do
+    socket =
+      socket
+      |> assign(:form, to_form(%{"search" => search}))
+      |> assign(:search, search)
+      |> push_patch(to: ~p"/explore")
+
+    {:noreply, socket}
   end
 
   def handle_event("follow", %{"fm_id" => fm_id}, socket) do
