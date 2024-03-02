@@ -33,7 +33,7 @@ defmodule WaveletFMWeb.Radio do
         reaction =
           fm.posts
           |> Enum.at(0) # safe given Enum.count(fm.posts) > 0 restriction
-          |> Posts.get_reaction(fm)
+          |> Posts.get_reaction(socket.assigns.current_fm)
         Map.put(acc, fm.id, reaction)
       end)
 
@@ -55,11 +55,26 @@ defmodule WaveletFMWeb.Radio do
       socket.assigns.indexing
       |> Map.update!(fm_id, fn x -> rem(x - 1, Enum.count(fm.posts)) end)
 
-    fm = fm |> set_index(indexing) |> set_reactions(socket.assigns.reactions)
+    index = Map.fetch!(indexing, fm_id)
+
+    reaction =
+      fm.posts
+      |> Enum.at(index)
+      |> Posts.get_reaction(socket.assigns.current_fm)
+
+    reactions =
+      socket.assigns.reactions
+      |> Map.put(fm_id, reaction)
+
+    fm =
+      fm
+      |> set_index(indexing)
+      |> set_reactions(reactions)
 
     socket =
       socket
       |> assign(:indexing, indexing)
+      |> assign(:reactions, reactions)
       |> stream_insert(:fms, fm)
 
     {:noreply, socket}
@@ -72,11 +87,26 @@ defmodule WaveletFMWeb.Radio do
       socket.assigns.indexing
       |> Map.update!(fm_id, fn x -> rem(x + 1, Enum.count(fm.posts)) end)
 
-    fm = fm |> set_index(indexing) |> set_reactions(socket.assigns.reactions)
+    index = Map.fetch!(indexing, fm_id)
+
+    reaction =
+      fm.posts
+      |> Enum.at(index)
+      |> Posts.get_reaction(socket.assigns.current_fm)
+
+    reactions =
+      socket.assigns.reactions
+      |> Map.put(fm_id, reaction)
+
+    fm =
+      fm
+      |> set_index(indexing)
+      |> set_reactions(reactions)
 
     socket =
       socket
       |> assign(:indexing, indexing)
+      |> assign(:reactions, reactions)
       |> stream_insert(:fms, fm)
 
     {:noreply, socket}
@@ -90,10 +120,9 @@ defmodule WaveletFMWeb.Radio do
       "heat" -> :heat
     end
       
-    fm = fm_id |> FMs.get_fm()
     post = post_id |> Posts.get_post!()
 
-    reaction = Posts.get_reaction(post, fm)
+    reaction = Posts.get_reaction(post, socket.assigns.current_fm)
     exists = reaction.love || reaction.heat
 
     {:ok, reaction} =
@@ -105,14 +134,15 @@ defmodule WaveletFMWeb.Radio do
         %Reaction{love: love, heat: heat} when exists ->
           Posts.update_reaction(reaction, %{love: love, heat: heat})
         %Reaction{love: love, heat: heat} ->
-          Posts.create_reaction(fm, post, %{love: love, heat: heat})
+          Posts.create_reaction(socket.assigns.current_fm, post, %{love: love, heat: heat})
       end
 
     reactions =
       socket.assigns.reactions
       |> Map.put(fm_id, reaction)
 
-    fm = fm |> set_index(socket.assigns.indexing) |> set_reactions(reactions)
+    fm =
+      fm_id |> FMs.get_fm() |> set_index(socket.assigns.indexing) |> set_reactions(reactions)
 
     socket =
       socket
@@ -127,7 +157,6 @@ defmodule WaveletFMWeb.Radio do
     Map.put(fm, :index, idx)
   end
 
-  # WARNING: that set_reactions is dependent on running set_index first
   defp set_reactions(%FM{} = fm, reactions) do
     reaction = Map.fetch!(reactions, fm.id)
     fm
