@@ -139,6 +139,7 @@
     display: flex;
     flex: 1;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .wavelet-cover {
@@ -151,8 +152,33 @@
 }
 
 .wavelet-text {
-    flex-basis: calc(25% - 2px);
+    padding-top: 5px;
+    flex-basis: calc(30% - 2px);
     height: 25%;
+    white-space: nowrap;
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.scroll-text.scrolling {
+  animation: scroll 5s linear infinite;
+}
+
+.wavelet-reactions {
+    flex-basis: calc(25% - 2px);
+    display: flex;
+    flex: 1;
+    flex-direction: row;
+    height: 25%;
+    align-items: center;
+    padding-top: 15px;
 }
 
 .post-container {
