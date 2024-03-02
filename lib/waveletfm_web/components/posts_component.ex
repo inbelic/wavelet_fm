@@ -32,7 +32,7 @@ defmodule WaveletFMWeb.Components.PostsComponent do
           <h1 class="ml-2">
             <%= fm.freq %> <%= fm.username %> FM
           </h1>
-          <%= if @current_fm && @show_follow == "true" do %>
+          <%= if @current_fm && @show_follow do %>
             <% {f_outline, f_fill} = assign_class(fm) %>
             <div class="follow" phx-click="follow" phx-value-fm_id={fm.id}>
               <div class={f_outline}>

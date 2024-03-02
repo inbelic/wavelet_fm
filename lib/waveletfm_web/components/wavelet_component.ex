@@ -20,7 +20,7 @@ defmodule WaveletFMWeb.Components.WaveletComponent do
         <%= if @wavelet.artist != "" do %> by <% end %><%= @wavelet.artist %>
         </div>
         <div class="reaction-links-container">
-          <%= if @show_reactions == "true" do %>
+          <%= if @show_reactions do %>
             <.live_component
               module = {ReactionComponent}
               fm={@fm}
