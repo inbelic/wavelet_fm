@@ -1,6 +1,10 @@
 defmodule WaveletFMWeb.Components.StreamWaveletsComponent do
   use WaveletFMWeb, :live_component
 
+  alias WaveletFMWeb.Components.WaveletReactionComponent
+
+  defp random_id, do: Integer.to_string(Enum.random(0..1_000_000))
+
   def render(assigns) do
     ~H"""
     <div id="post-feed" phx-update="stream" class="">
@@ -21,6 +25,13 @@ defmodule WaveletFMWeb.Components.StreamWaveletsComponent do
             <%= if wavelet.artist != "" do %> by <% end %><%= wavelet.artist %>
             </div>
             <div class="wavelet-text">
+              <%= if @show_reactions do %>
+                <.live_component
+                  module = {WaveletReactionComponent}
+                  id={dom_id <> random_id()}
+                  wavelet={wavelet}
+                />
+              <% end %>
             </div>
           </div>
         </div>

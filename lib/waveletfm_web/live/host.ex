@@ -1,6 +1,7 @@
 defmodule WaveletFMWeb.Host do
   use WaveletFMWeb, :live_view
 
+  alias WaveletFM.FMs
   alias WaveletFM.Wavelets
   alias WaveletFM.Wavelets.Wavelet
   alias WaveletFMWeb.Components.StreamWaveletsComponent
@@ -10,10 +11,24 @@ defmodule WaveletFMWeb.Host do
   alias External.Spotify
 
   def mount(_params, _session, socket) do
+    fm = FMs.get_fm(socket.assigns.current_fm.id)
+
+    reactions =
+      fm.posts
+      |> Enum.map(fn post -> Posts.tally_reactions(post) end)
+      |> Enum.map(fn x -> Enum.map(x,
+        fn {key, val} -> if val do {key, val} else {key, 0} end end)
+      end)
+      |> append_empties(empty_reaction(), 5)
+
     wavelets =
-      socket.assigns.current_fm
-      |> Wavelets.get_wavelets_by_fm()
-      |> append_empties(5)
+      fm.posts
+      |> Enum.map(fn post -> post.wavelet end)
+      |> append_empties(empty_wavelet(), 5)
+
+    wavelets =
+      Enum.zip(wavelets, reactions)
+      |> Enum.map(fn {wavelet, reaction} -> set_reactions(wavelet, reaction) end)
 
     socket =
       socket
@@ -60,6 +75,7 @@ defmodule WaveletFMWeb.Host do
         # values
         {:ok, wavelet} = Wavelets.create_wavelet(searched_wavelet)
         {:ok, _post} = Posts.create_post(socket.assigns.current_fm, wavelet)
+        wavelet = set_reactions(wavelet, empty_reaction())
 
         socket =
           socket
@@ -106,17 +122,28 @@ defmodule WaveletFMWeb.Host do
       cover: ~p"/images/empty_wavelet.svg", links: []}
   end
 
-  defp append_empties(list, num) when num <= length(list) do
+  defp empty_reaction(), do: []
+
+  defp append_empties(list, _el, num) when num <= length(list) do
     list
   end
 
-  defp append_empties(list, num) do
+  defp append_empties(list, el, num) do
     to_take = max(0, num - length(list))
-    list ++ Enum.map(1..to_take, fn _ -> empty_wavelet() end)
+    list ++ Enum.map(1..to_take, fn _ -> el end)
   end
 
-  defp to_wavelet(%{"id" => id, "title" => title, "artist" => artist,
-    "cover" => cover, "links" => links}) do
+  defp to_wavelet(params) do
+    %{"id" => id, "title" => title, "artist" => artist} = params
+    %{"cover" => cover, "links" => links} = params
     %Wavelet{id: id, title: title, artist: artist, cover: cover, links: links}
+  end
+
+  defp set_reactions(%Wavelet{} = wavelet, reactions) do
+    love = Keyword.get(reactions, :love, 0)
+    heat = Keyword.get(reactions, :heat, 0)
+    wavelet
+    |> Map.put(:love, love)
+    |> Map.put(:heat, heat)
   end
 end

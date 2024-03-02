@@ -173,6 +173,21 @@ defmodule WaveletFM.Posts do
   end
 
   @doc """
+  Tally reactions on a post. Returns a struct %{reaction_type: integer, ...}
+  """
+  def tally_reactions(post) do
+    query =
+      from reaction in Reaction,
+        where: reaction.post_id == ^post.id,
+        select: %{
+          love: sum(fragment("CASE WHEN ? THEN 1 ELSE 0 END", reaction.love)),
+          heat: sum(fragment("CASE WHEN ? THEN 1 ELSE 0 END", reaction.heat))
+            }
+
+    Repo.one(query)
+  end
+
+  @doc """
   Creates a reaction.
 
   ## Examples
