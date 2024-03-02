@@ -9,7 +9,7 @@ defmodule WaveletFMWeb.Components.StreamWaveletsComponent do
     ~H"""
     <div id="post-feed" phx-update="stream" class="">
       <div :for={{dom_id, wavelet} <- @wavelets} id={dom_id} class="wavelet-container wavelet-hover mt-3" >
-          <div class="wavelet-cover" phx-click={@js |> JS.push("selected", value: %{wavelet: wavelet})}>
+          <div class="wavelet-cover" phx-click={JS.push("selected", value: %{wavelet: wavelet})}>
             <div class="cover-wrapper">
               <img src={wavelet.cover} alt="Cover Art"/>
             </div>

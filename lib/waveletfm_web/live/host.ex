@@ -12,9 +12,10 @@ defmodule WaveletFMWeb.Host do
 
   def mount(_params, _session, socket) do
     fm = FMs.get_fm(socket.assigns.current_fm.id)
+    posts = fm.posts |> Enum.sort_by(fn p -> p.inserted_at end)
 
     reactions =
-      fm.posts
+      posts
       |> Enum.map(fn post -> Posts.tally_reactions(post) end)
       |> Enum.map(fn x -> Enum.map(x,
         fn {key, val} -> if val do {key, val} else {key, 0} end end)
@@ -22,7 +23,8 @@ defmodule WaveletFMWeb.Host do
       |> append_empties(empty_reaction(), 5)
 
     wavelets =
-      fm.posts
+      posts
+      |> Enum.sort(fn px, py -> px.inserted_at >= py.inserted_at end)
       |> Enum.map(fn post -> post.wavelet end)
       |> append_empties(empty_wavelet(), 5)
 
@@ -50,12 +52,42 @@ defmodule WaveletFMWeb.Host do
 
     {:noreply, socket}
   end
+
+  def handle_event("data-cancel", %{}, socket) do
+    socket =
+      socket
+      |> assign(wavelet: nil)
+    {:noreply, socket}
+  end
   
   def handle_event("selected", %{"wavelet" => json_wavelet}, socket) do
     case socket.assigns.wavelet do
       nil ->
         replace_wavelet = to_wavelet(json_wavelet)
-        {:noreply, assign(socket, wavelet: replace_wavelet)}
+        posts = socket.assigns.current_fm |> Posts.get_posts_by_fm()
+        if Enum.count(posts) < 5 do
+          socket =
+            socket
+            |> push_event("search-modal", %{on: true})
+            |> assign(wavelet: replace_wavelet)
+          {:noreply, socket}
+        else
+          post = Enum.at(posts, 0)
+          {:ok, current_time} = DateTime.now("Etc/UTC")
+          diff = DateTime.diff(current_time, post.inserted_at, :hour)
+          if diff < 24 do
+            socket =
+              socket
+              |> put_flash(:error, "You must wait #{24 - diff} hours until your next update.")
+            {:noreply, socket}
+          else
+            socket =
+              socket
+              |> push_event("search-modal", %{on: true})
+              |> assign(wavelet: replace_wavelet)
+            {:noreply, socket}
+          end
+        end
       replace_wavelet ->
         searched_wavelet = to_wavelet(json_wavelet)
 
@@ -81,6 +113,7 @@ defmodule WaveletFMWeb.Host do
           socket
           |> stream_delete(:wavelets, replace_wavelet)
           |> stream_insert(:wavelets, wavelet, at: 0)
+          |> push_event("search-modal", %{on: false})
 
         {:noreply, push_patch(socket, to: ~p"/host")}
     end

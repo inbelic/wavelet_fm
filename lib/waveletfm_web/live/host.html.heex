@@ -8,8 +8,11 @@
     js={ show_modal("search-modal") }
     wavelets={@streams.wavelets}
     show_reactions={true}
-  />
-  <.modal id="search-modal">
+    />
+  <div id="search-modal-toggles"
+          toggle_on={show_modal("search-modal")}
+          toggle_off={hide_modal("search-modal")}>
+    <.modal id="search-modal" on_cancel={JS.push("data-cancel")}>
       <.simple_form
         for={@form}
         id="wavelet_form"
@@ -28,7 +31,7 @@
             Search
           </.button>
         </:actions>
-    </.simple_form>
+      </.simple_form>
     <div style="height: 1rem">
     </div>
     <.live_component
@@ -39,4 +42,5 @@
        show_reactions={false}
     />
   </.modal>
+  </div>
 </div>
