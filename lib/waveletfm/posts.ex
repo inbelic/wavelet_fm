@@ -147,20 +147,30 @@ defmodule WaveletFM.Posts do
   end
 
   @doc """
-  Gets a single reaction.
+  Gets the reactions on a post, done by fm.
 
-  Raises `Ecto.NoResultsError` if the Reaction does not exist.
+  Returns a Reaction with all values set to false if the Reaction does not exist.
 
   ## Examples
 
-      iex> get_reaction!(123)
+      iex> get_reaction(post, fm)
       %Reaction{}
 
-      iex> get_reaction!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_reaction(post, fm)
+      nil
 
   """
-  def get_reaction!(id), do: Repo.get!(Reaction, id)
+  def get_reaction(post, fm) do
+    query =
+      from reaction in Reaction,
+        where: reaction.fm_id == ^fm.id,
+        where: reaction.post_id == ^post.id,
+        select: reaction
+    case Repo.one(query) do
+      nil -> %Reaction{love: false, heat: false}
+      reaction -> reaction
+    end
+  end
 
   @doc """
   Creates a reaction.

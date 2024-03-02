@@ -84,13 +84,13 @@ defmodule WaveletFMWeb.Explore do
   end
 
   def handle_event("prev", %{"fm_id" => fm_id}, socket) do
+    fm = fm_id |> FMs.get_fm()
+
     indexing =
       socket.assigns.indexing
-      |> Map.update!(fm_id, fn x -> x - 1 end)
+      |> Map.update!(fm_id, fn x -> rem(x - 1, Enum.count(fm.posts)) end)
 
-    fm =
-      fm_id
-      |> FMs.get_fm()
+    fm = fm
       |> set_following(socket.assigns.following)
       |> set_index(indexing)
 
@@ -103,13 +103,13 @@ defmodule WaveletFMWeb.Explore do
   end
 
   def handle_event("next", %{"fm_id" => fm_id}, socket) do
+    fm = fm_id |> FMs.get_fm()
+
     indexing =
       socket.assigns.indexing
-      |> Map.update!(fm_id, fn x -> x + 1 end)
+      |> Map.update!(fm_id, fn x -> rem(x + 1, Enum.count(fm.posts)) end)
 
-    fm =
-      fm_id
-      |> FMs.get_fm()
+    fm = fm
       |> set_following(socket.assigns.following)
       |> set_index(indexing)
 

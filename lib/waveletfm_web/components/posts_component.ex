@@ -16,8 +16,7 @@ defmodule WaveletFMWeb.Components.PostsComponent do
     <div id="fm-feed" phx-update="stream" class="">
       <div :for={{dom_id, fm} <- @fms} id={dom_id} class="post-container mt-3"
         :if={!@current_fm || fm.id != @current_fm.id}>
-        <% idx = rem(fm.index, Enum.count(fm.posts)) %>
-        <% post = Enum.at(fm.posts, idx) %>
+        <% post = Enum.at(fm.posts, fm.index) %>
         <% wavelet = post.wavelet %>
         <div class="fm-container">
         <%= if fm.profiled do %>
@@ -57,9 +56,11 @@ defmodule WaveletFMWeb.Components.PostsComponent do
           </button>
           <.live_component
            module = {WaveletComponent}
-            id={dom_id <> "-reactions"}
+            id={dom_id <> "-wavelet"}
+            fm={fm}
             wavelet={wavelet}
             post={post}
+            show_reactions={@show_reactions}
           />
           <button phx-click="next" phx-value-fm_id={fm.id}>
             <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
