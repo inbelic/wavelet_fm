@@ -79,15 +79,9 @@ defmodule WaveletFM.Posts do
 
   """
   def create_post(%FM{} = fm, %Wavelet{} = wavelet) do
-    attrs = init_attrs()
-
     %Post{fm_id: fm.id, wavelet_id: wavelet.id}
-    |> Post.changeset(attrs)
+    |> Post.changeset(%{})
     |> Repo.insert()
-  end
-
-  defp init_attrs() do
-    %{"heat" => 0, "love" => 0, "wacky" => 0, "mood" => 0}
   end
 
   @doc """
@@ -135,5 +129,101 @@ defmodule WaveletFM.Posts do
   """
   def change_post(%Post{} = post, attrs \\ %{}) do
     Post.changeset(post, attrs)
+  end
+
+  alias WaveletFM.Posts.Reaction
+
+  @doc """
+  Returns the list of reaction.
+
+  ## Examples
+
+      iex> list_reaction()
+      [%Reaction{}, ...]
+
+  """
+  def list_reaction do
+    Repo.all(Reaction)
+  end
+
+  @doc """
+  Gets a single reaction.
+
+  Raises `Ecto.NoResultsError` if the Reaction does not exist.
+
+  ## Examples
+
+      iex> get_reaction!(123)
+      %Reaction{}
+
+      iex> get_reaction!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_reaction!(id), do: Repo.get!(Reaction, id)
+
+  @doc """
+  Creates a reaction.
+
+  ## Examples
+
+      iex> create_reaction(%{field: value})
+      {:ok, %Reaction{}}
+
+      iex> create_reaction(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_reaction(fm, post, attrs \\ %{}) do
+    %Reaction{fm_id: fm.id, post_id: post.id}
+    |> Reaction.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a reaction.
+
+  ## Examples
+
+      iex> update_reaction(reaction, %{field: new_value})
+      {:ok, %Reaction{}}
+
+      iex> update_reaction(reaction, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_reaction(%Reaction{} = reaction, attrs) do
+    reaction
+    |> Reaction.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a reaction.
+
+  ## Examples
+
+      iex> delete_reaction(reaction)
+      {:ok, %Reaction{}}
+
+      iex> delete_reaction(reaction)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_reaction(%Reaction{} = reaction) do
+    Repo.delete(reaction)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking reaction changes.
+
+  ## Examples
+
+      iex> change_reaction(reaction)
+      %Ecto.Changeset{data: %Reaction{}}
+
+  """
+  def change_reaction(%Reaction{} = reaction, attrs \\ %{}) do
+    Reaction.changeset(reaction, attrs)
   end
 end

@@ -21,4 +21,19 @@ defmodule WaveletFM.PostsFixtures do
 
     post
   end
+
+  @doc """
+  Generate a reaction.
+  """
+  def reaction_fixture(attrs \\ %{}) do
+    {:ok, reaction} =
+      attrs
+      |> Enum.into(%{
+        heat: true,
+        love: true
+      })
+      |> WaveletFM.Posts.create_reaction()
+
+    reaction
+  end
 end

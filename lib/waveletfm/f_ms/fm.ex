@@ -10,6 +10,7 @@ defmodule WaveletFM.FMs.FM do
     field :profiled, :boolean # denotes if a user has a profile picture, id is used for file name
     belongs_to :user, WaveletFM.Accounts.User
     has_many :posts, WaveletFM.Posts.Post
+    has_many :reactions, WaveletFM.Posts.Reaction
 
     timestamps(type: :utc_datetime)
   end

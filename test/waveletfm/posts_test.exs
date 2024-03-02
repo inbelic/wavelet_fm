@@ -64,4 +64,60 @@ defmodule WaveletFM.PostsTest do
       assert %Ecto.Changeset{} = Posts.change_post(post)
     end
   end
+
+  describe "reaction" do
+    alias WaveletFM.Posts.Reaction
+
+    import WaveletFM.PostsFixtures
+
+    @invalid_attrs %{heat: nil, love: nil}
+
+    test "list_reaction/0 returns all reaction" do
+      reaction = reaction_fixture()
+      assert Posts.list_reaction() == [reaction]
+    end
+
+    test "get_reaction!/1 returns the reaction with given id" do
+      reaction = reaction_fixture()
+      assert Posts.get_reaction!(reaction.id) == reaction
+    end
+
+    test "create_reaction/1 with valid data creates a reaction" do
+      valid_attrs = %{heat: true, love: true}
+
+      assert {:ok, %Reaction{} = reaction} = Posts.create_reaction(valid_attrs)
+      assert reaction.heat == true
+      assert reaction.love == true
+    end
+
+    test "create_reaction/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Posts.create_reaction(@invalid_attrs)
+    end
+
+    test "update_reaction/2 with valid data updates the reaction" do
+      reaction = reaction_fixture()
+      update_attrs = %{heat: false, love: false}
+
+      assert {:ok, %Reaction{} = reaction} = Posts.update_reaction(reaction, update_attrs)
+      assert reaction.heat == false
+      assert reaction.love == false
+    end
+
+    test "update_reaction/2 with invalid data returns error changeset" do
+      reaction = reaction_fixture()
+      assert {:error, %Ecto.Changeset{}} = Posts.update_reaction(reaction, @invalid_attrs)
+      assert reaction == Posts.get_reaction!(reaction.id)
+    end
+
+    test "delete_reaction/1 deletes the reaction" do
+      reaction = reaction_fixture()
+      assert {:ok, %Reaction{}} = Posts.delete_reaction(reaction)
+      assert_raise Ecto.NoResultsError, fn -> Posts.get_reaction!(reaction.id) end
+    end
+
+    test "change_reaction/1 returns a reaction changeset" do
+      reaction = reaction_fixture()
+      assert %Ecto.Changeset{} = Posts.change_reaction(reaction)
+    end
+  end
 end
