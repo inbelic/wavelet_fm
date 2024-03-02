@@ -16,7 +16,8 @@ defmodule WaveletFMWeb.Components.WaveletComponent do
               class="wavelet-text scroll-text text-lg ml-1">
           <bold><%= @wavelet.title %></bold>
         </div>
-        <div class="wavelet-text text-sm ml-2">
+        <div phx-click={JS.toggle_class("scrolling")}
+              class="wavelet-text scroll-text text-sm ml-2">
         <%= if @wavelet.artist != "" do %> by <% end %><%= @wavelet.artist %>
         </div>
         <div class="reaction-links-container">

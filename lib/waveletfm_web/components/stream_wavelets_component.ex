@@ -18,10 +18,12 @@ defmodule WaveletFMWeb.Components.StreamWaveletsComponent do
           <div class="wavelet-sub-container">
             <div class="wavelet-text">
             </div>
-            <div class="wavelet-text text-lg ml-1">
+            <div phx-click={JS.toggle_class("scrolling")}
+                class="wavelet-text text-lg ml-1 scroll-text">
               <bold><%= wavelet.title %></bold>
             </div>
-            <div class="wavelet-text text-sm ml-2">
+            <div phx-click={JS.toggle_class("scrolling")}
+             class="wavelet-text text-sm ml-2 scroll-text">
             <%= if wavelet.artist != "" do %> by <% end %><%= wavelet.artist %>
             </div>
             <div class="wavelet-text">
