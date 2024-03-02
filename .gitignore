@@ -40,3 +40,6 @@ npm-debug.log
 
 # Do not upload any personal uploads
 /priv/static/uploads/*
+
+# Do not upload brand content
+/priv/static/images/spotify*

@@ -19,11 +19,17 @@ defmodule WaveletFMWeb.Components.WaveletComponent do
         <div class="wavelet-text text-sm ml-2">
         <%= if @wavelet.artist != "" do %> by <% end %><%= @wavelet.artist %>
         </div>
-        <.live_component
-           module = {ReactionComponent}
-           id={@id <> "-reactions"}
-           post={@post}
-        />
+        <div class="reaction-links-container">
+          <.live_component
+             module = {ReactionComponent}
+             id={@id <> "-reactions"}
+             post={@post}
+          />
+          <% spotify_link = Enum.at(@wavelet.links, 0) %>
+          <a href={spotify_link} target="_blank" class="">
+            <img src="/images/spotify_icon.png" alt="Spotify Link" class="spotify-icon" />
+          </a>
+        </div>
       </div>
     </div>
     """

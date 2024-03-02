@@ -227,3 +227,19 @@
     margin-top: -30px;
     margin-bottom: 20px;
 }
+
+.reaction-icon:hover {
+    color: #FF6961;
+}
+
+.reaction-links-container {
+    display: inline-flex;
+    align-items: center;
+}
+
+.spotify-icon {
+    height: max(21px, 4vh);
+    aspect-ratio: 1;
+    margin-top: 2vh;
+    margin-right: 3vh;
+}
