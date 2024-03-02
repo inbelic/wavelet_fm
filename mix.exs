@@ -60,6 +60,7 @@ defmodule WaveletFM.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.2"},
       {:httpoison, "~> 2.0"},
+      {:image, "~> 0.37"},
       {:poison, "~> 5.0"}
     ]
   end

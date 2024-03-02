@@ -225,8 +225,17 @@ defmodule WaveletFMWeb.UserSettingsLive do
     dest = Path.join(Application.app_dir(:waveletfm, "priv/static/uploads"), fm.id)
 
     uploaded_files =
-      consume_uploaded_entries(socket, :profile, fn %{path: path}, _entry ->
-        File.cp!(path, dest)
+      consume_uploaded_entries(socket, :profile, fn %{path: path}, entry ->
+        ext_type = case entry.client_type do
+          "image/jpg" -> ".jpg"
+          "image/png" -> ".png"
+          "image/jpeg" -> ".jpeg"
+        end
+        img_dest = dest <> ext_type
+        {:ok, image} = Image.open(path)
+        {:ok, image} = Image.thumbnail(image, 200, crop: :attention)
+        Image.write(image, img_dest)
+        File.rename!(img_dest, dest)
         {:ok, ~p"/uploads/#{Path.basename(dest)}"}
       end)
 
@@ -260,4 +269,8 @@ defmodule WaveletFMWeb.UserSettingsLive do
   defp get_action(_, _) do
     :add # uploaded photo so will replace the existing wheter rmv_profile is selected or not
   end
+
+  defp error_to_string(:too_large), do: "Selected file is too large"
+  defp error_to_string(:too_many_files), do: "You have selected too many files"
+  defp error_to_string(:not_accepted), do: "Only file types allowed are jpg, jpeg and png"
 end
