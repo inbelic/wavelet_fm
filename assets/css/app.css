@@ -85,11 +85,17 @@
     color: #c0c0c0;
 }
 
+.footer-spacer {
+    height: 7vh;
+}
+
 .footer {
     background-color: white;
     border-top: 2px solid black;
     bottom: 0;
-    height: 10vh;
+    height: 7vh;
+    width: 100%;
+    position: fixed;
 }
 
 .footer-icons {
