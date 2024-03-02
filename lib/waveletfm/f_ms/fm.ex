@@ -51,6 +51,7 @@ defmodule WaveletFM.FMs.FM do
 
   def validate_username(changeset, opts) do
     changeset
+    |> validate_length(:username, max: 15)
     |> validate_format(:username, ~r/[a-z\.]$/, message: "must only be lowercase letters and .")
     |> maybe_validate_unique_username(opts)
   end
