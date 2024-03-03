@@ -17,7 +17,8 @@ defmodule WaveletFM.Application do
       # Start a worker by calling: WaveletFM.Worker.start_link(arg)
       # {WaveletFM.Worker, arg},
       # Start to serve requests, typically the last entry
-      WaveletFMWeb.Endpoint
+      WaveletFMWeb.Endpoint,
+      {Task, fn -> shutdown_when_inactive(:timer.minutes(10)) end},
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -32,5 +33,14 @@ defmodule WaveletFM.Application do
   def config_change(changed, _new, removed) do
     WaveletFMWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp shutdown_when_inactive(every_ms) do
+    Process.sleep(every_ms)
+    if :ranch.procs(AppWeb.Endpoint.HTTP, :connections) == [] do
+      System.stop(0)
+    else
+      shutdown_when_inactive(every_ms)
+    end
   end
 end
