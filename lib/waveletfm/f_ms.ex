@@ -33,8 +33,8 @@ defmodule WaveletFM.FMs do
       from fm in FM,
         where: ilike(fm.username, ^"%#{search}%"),
         preload: [posts: [:wavelet]],
+        limit: 25,
         select: fm
-        limit: 25
 
     Repo.all(query)
   end

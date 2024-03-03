@@ -106,6 +106,16 @@
     margin: 0 20%;
 }
 
+.footer-icon {
+    height: 6vh;
+    width: 6vh;
+}
+
+.header-icon {
+    height: 12vh;
+    width: 12vh;
+}
+
 .fm-container {
     display: flex;
     height: 2rem;
@@ -242,4 +252,51 @@
     aspect-ratio: 1;
     margin-top: 2vh;
     margin-right: 3vh;
+}
+
+.home-header {
+    height: 10vh;
+    background-color: white;
+    text-align: center;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.home-container {
+    width: 80%;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: -150px;
+}
+
+.hero {
+    color: black;
+    text-align: center;
+    padding: 100px 0;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -125px;
+}
+
+.hero-icon {
+    height: 80%;
+    aspect-ratio: 1;
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero h1 {
+    font-size: 4rem;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
 }

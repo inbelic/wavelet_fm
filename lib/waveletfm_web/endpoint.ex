@@ -22,7 +22,7 @@ defmodule WaveletFMWeb.Endpoint do
   plug Plug.Static,
     at: "/",
     from: :waveletfm,
-    gzip: false,
+    gzip: true,
     only: WaveletFMWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the

@@ -1,0 +1,54 @@
+<header class="home-header font-brand">
+  <div>
+  </div>
+  <%= if @current_user == nil do %>
+    <div class="flex">
+      <.link navigate={~p"/users/log_in"} class="font-semibold text-brand hover:underline">
+        Sign in
+      </.link>
+      <.link navigate={~p"/users/register"} class="ml-2 font-semibold text-brand hover:underline">
+        Register
+      </.link>
+    </div>
+  <% end %>
+</header>
+<main class="font-brand">
+  <section class="hero">
+    <div class="hero-icon">
+      <img class="hero-icon" src={~p"/images/full-icon.svg"} alt="Profile Picture" />
+    </div>
+  </section>
+  <ul class="home-container">
+    <li class="mt-2">
+      <.link navigate={~p"/host"} class="ml-2 font-semibold text-brand hover:underline">
+      Broadcast
+      </.link>
+      an FM of your top songs</li>
+    <li class="mt-2">
+      <.link navigate={~p"/radio"} class="ml-2 font-semibold text-brand hover:underline">
+      Connect
+      </.link>
+      through your top songs</li>
+    <li class="mt-2">
+      <.link navigate={~p"/explore"} class="ml-2 font-semibold text-brand hover:underline">
+      Explore
+      </.link>
+      top FMs for your next anthem
+    </li>
+  </ul>
+</main>
+<footer class="h-[120px] w-full flex justify-center text-black px-16 py-20
+  font-brand font-regular text-xs bg-fmDark-dark">
+  <div class="w-full px-10">
+    <div class="border-t-[1px] border-black"></div>
+    <div class="flex justify-center item-center py-6">
+      <img class="footer-icon mt-[-2vh]" src={~p"/images/icon.svg"} alt="Logo" />
+      <h1 class="ml-1 mr-4">© 2024 WaveletFM</h1>
+      <div class="text-fmGrapefruit flex">
+        <a href={~p"/"} class="hover:underline mr-3">Terms</a>
+        <a href={~p"/"} class="hover:underline mr-3">Privacy</a>
+        <a href={~p"/"} class="hover:underline mr-3">About</a>
+      </div>
+    </div>
+  </div>
+</footer>
