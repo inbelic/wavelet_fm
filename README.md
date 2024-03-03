@@ -4,7 +4,7 @@ Given I am not the best at keeping in touch by text with my distant friends, and
 
 ## Official Instance and Self Hosting
 
-My "official" instance of WaveletFM is hosted by [fly.io](https://fly.io/). Feel free to [join the community] (https://waveletfm.fly.dev/)! Otherwise, this repository is open-sourced to allow self-hosting. All hosting related artifacts are not included. It will also be required to generate your own [Spotify WebAPI](https://developer.spotify.com/documentation/web-api) client credentials (and other credentials when they are implemented) and store them in your environment variables.
+My "official" instance of WaveletFM is hosted by [fly.io](https://fly.io/). Feel free to [join the community](https://waveletfm.fly.dev/)! Otherwise, this repository is open-sourced to allow self-hosting. All hosting related artifacts are not included. It will also be required to generate your own [Spotify WebAPI](https://developer.spotify.com/documentation/web-api) client credentials (and other credentials when they are implemented) and store them in your environment variables.
 
 ### Latency
 
