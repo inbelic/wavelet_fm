@@ -43,3 +43,10 @@ npm-debug.log
 
 # Do not upload brand content
 /priv/static/images/spotify*
+
+# fly.io deployment related
+Dockerfile
+.dockerignore
+fly.toml
+lib/waveletfm/release.ex
+rel/
