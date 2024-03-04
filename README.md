@@ -35,11 +35,11 @@ There are a number of features and improvements on the roadmap.
 
 ### v0.1-release:
 
-- [ ] Add terms and privacy
 - [ ] Enable Swoosh production API
 - [ ] Enable external uploading of profile pictures for scaling
 
-### v-1.0:
+### v-0.1-public:
+- [ ] Add terms and privacy
 - [ ] Enable search with Apple Music, YouTube Music, Soundcloud and Bandcamp API
 - [ ] Enable search with a provided link to a track entity (from any implemented
     API)
