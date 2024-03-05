@@ -64,6 +64,7 @@ defmodule WaveletFM.MixProject do
       {:poison, "~> 5.0"},
       {:ex_aws, "~> 2.0"},
       {:ex_aws_s3, "~> 2.0"},
+      {:ranch, "~> 2.1"},
     ]
   end
 

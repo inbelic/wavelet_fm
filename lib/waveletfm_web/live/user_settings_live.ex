@@ -35,7 +35,7 @@ defmodule WaveletFMWeb.UserSettingsLive do
           <.input
             field={@fm_form[:current_password]}
             name="current_password"
-            id="current_password_for_email"
+            id="current_password_for_fm"
             type="password"
             label="Current password"
             value={@fm_form_current_password}
