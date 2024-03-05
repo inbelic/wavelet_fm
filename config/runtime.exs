@@ -24,6 +24,12 @@ config :waveletfm,
   spotify_client_id: System.get_env("SPOTIFY_CLIENT_ID", nil),
   spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET", nil)
 
+config :ex_aws,
+  region: System.get_env("AWS_REGION", nil),
+  access_key_id: [System.get_env("AWS_ACCESS_KEY_ID", nil), {:awscli, "default", 30}, :instance_role],
+  secret_access_key: [System.get_env("AWS_SECRET_ACCESS_KEY", nil), {:awscli, "default", 30}, :instance_role],
+  bucket: System.get_env("AWS_BUCKET", nil)
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

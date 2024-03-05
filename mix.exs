@@ -61,7 +61,9 @@ defmodule WaveletFM.MixProject do
       {:bandit, "~> 1.2"},
       {:httpoison, "~> 2.0"},
       {:image, "~> 0.37"},
-      {:poison, "~> 5.0"}
+      {:poison, "~> 5.0"},
+      {:ex_aws, "~> 2.0"},
+      {:ex_aws_s3, "~> 2.0"},
     ]
   end
 

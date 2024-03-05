@@ -222,7 +222,7 @@ defmodule WaveletFMWeb.UserSettingsLive do
     %{"current_password" => password, "fm" => fm_params} = params
     user = socket.assigns.current_user
     fm = user |> FMs.get_fm_by_user()
-    dest = Path.join(Application.app_dir(:waveletfm, "priv/static/uploads"), fm.id)
+    obj_key = "public/" <> fm.id
 
     uploaded_files =
       consume_uploaded_entries(socket, :profile, fn %{path: path}, entry ->
@@ -231,19 +231,18 @@ defmodule WaveletFMWeb.UserSettingsLive do
           "image/png" -> ".png"
           "image/jpeg" -> ".jpeg"
         end
-        img_dest = dest <> ext_type
         {:ok, image} = Image.open(path)
         {:ok, image} = Image.thumbnail(image, 200, crop: :attention)
-        Image.write(image, img_dest)
-        File.rename!(img_dest, dest)
-        {:ok, ~p"/uploads/#{Path.basename(dest)}"}
+        {:ok, image_bin} = Image.write(image, :memory, suffix: ext_type)
+        ExAws.S3.put_object(aws_bucket(), obj_key, image_bin) |> ExAws.request()
+        {:ok, obj_key}
       end)
 
     fm_params =
       case get_action(uploaded_files, fm_params["rmv_profile"]) do
         :non -> fm_params
         :rmv ->
-          File.rm(dest)
+          ExAws.S3.delete_object(aws_bucket(), "public/" <> fm.id) |> ExAws.request()
           Map.put(fm_params, "profiled", false)
         :add -> Map.put(fm_params, "profiled", true)
       end
@@ -257,6 +256,8 @@ defmodule WaveletFMWeb.UserSettingsLive do
         {:noreply, assign(socket, :fm_form, to_form(Map.put(changeset, :action, :insert)))}
     end
   end
+
+  defp aws_bucket, do: Application.get_env(:ex_aws, :bucket)
 
   defp get_action([], "true") do
     :rmv # no uploaded photo and request to remove profile pic
