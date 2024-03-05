@@ -232,6 +232,10 @@ defmodule WaveletFM.Accounts do
     end
   end
 
+  def delete_user(%User{} = user) do
+    Repo.delete(user)
+  end
+
   ## Session
 
   @doc """

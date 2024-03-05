@@ -2,7 +2,9 @@ defmodule WaveletFMWeb.UserSettingsLive do
   use WaveletFMWeb, :live_view
 
   alias WaveletFM.Accounts
+  alias WaveletFM.Accounts.User
   alias WaveletFM.FMs
+
   import Ecto.Changeset
 
   def render(assigns) do
@@ -100,6 +102,28 @@ defmodule WaveletFMWeb.UserSettingsLive do
           />
           <:actions>
             <.button phx-disable-with="Changing...">Change Password</.button>
+          </:actions>
+        </.simple_form>
+      </div>
+      <div class="mb-2">
+        <.simple_form
+          for={@password_form}
+          id="password_form"
+          action={~p"/users/log_out"}
+          method="delete"
+          phx-submit="delete_account"
+          phx-trigger-action={@trigger_submit}
+        >
+          <.input
+            name="current_password"
+            type="password"
+            label="Confirm password"
+            id="current_password_for_deletion"
+            value={@current_password}
+            required
+          />
+          <:actions>
+            <.button phx-disable-with="Deleting...">Delete Account</.button>
           </:actions>
         </.simple_form>
       </div>
@@ -235,6 +259,21 @@ defmodule WaveletFMWeb.UserSettingsLive do
     end
   end
 
+  def handle_event("delete_account", params, socket) do
+    %{"current_password" => password} = params
+    user = socket.assigns.current_user
+    if User.valid_password?(user, password) do
+      fm = user |> FMs.get_fm_by_user()
+      if fm.profiled do
+        ExAws.S3.delete_object(aws_bucket(), "public/" <> fm.id) |> ExAws.request()
+      end
+      Accounts.delete_user(user) # from the creation of the tables this will delete the fm and corresponding posts automatically
+      {:noreply, socket}
+    else
+      {:noreply, put_flash(socket, :error, "Incorrect password")}
+    end
+  end
+
   defp aws_bucket, do: Application.get_env(:ex_aws, :bucket)
 
   defp get_action([], "true") do
@@ -270,7 +309,7 @@ defmodule WaveletFMWeb.UserSettingsLive do
       case get_action(uploaded_files, fm_params["rmv_profile"]) do
         :non -> fm_params
         :rmv ->
-          ExAws.S3.delete_object(aws_bucket(), "public/" <> fm.id) |> ExAws.request()
+          ExAws.S3.delete_object(aws_bucket(), obj_key) |> ExAws.request()
           Map.put(fm_params, "profiled", false)
         :add -> Map.put(fm_params, "profiled", true)
       end
