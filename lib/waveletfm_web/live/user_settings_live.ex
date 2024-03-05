@@ -3,6 +3,7 @@ defmodule WaveletFMWeb.UserSettingsLive do
 
   alias WaveletFM.Accounts
   alias WaveletFM.FMs
+  import Ecto.Changeset
 
   def render(assigns) do
     ~H"""
@@ -222,6 +223,33 @@ defmodule WaveletFMWeb.UserSettingsLive do
     %{"current_password" => password, "fm" => fm_params} = params
     user = socket.assigns.current_user
     fm = user |> FMs.get_fm_by_user()
+    if User.valid_password?(user, password) do
+      update_fm(fm, fm_params, socket)
+    else
+      fm_form =
+        fm
+        |> FMs.change_fm(fm_params, validate_fm: false)
+        |> add_error(:current_password, "is not valid")
+        |> to_form()
+      {:noreply, assign(socket, :fm_form, fm_form)}
+    end
+  end
+
+  defp aws_bucket, do: Application.get_env(:ex_aws, :bucket)
+
+  defp get_action([], "true") do
+    :rmv # no uploaded photo and request to remove profile pic
+  end
+
+  defp get_action([], "false") do
+    :non # no uploaded photo and no request to remove profile pic
+  end
+
+  defp get_action(_, _) do
+    :add # uploaded photo so will replace the existing wheter rmv_profile is selected or not
+  end
+
+  defp update_fm(fm, fm_params, socket) do
     obj_key = "public/" <> fm.id
 
     uploaded_files =
@@ -247,7 +275,7 @@ defmodule WaveletFMWeb.UserSettingsLive do
         :add -> Map.put(fm_params, "profiled", true)
       end
 
-    case FMs.update_fm(fm, user, password, fm_params) do
+    case FMs.update_fm(fm, fm_params) do
       {:ok, _fm} ->
         info = "FM successfully updated."
         {:noreply, socket |> put_flash(:info, info) |> assign(fm_form_current_password: nil)}
@@ -256,22 +284,4 @@ defmodule WaveletFMWeb.UserSettingsLive do
         {:noreply, assign(socket, :fm_form, to_form(Map.put(changeset, :action, :insert)))}
     end
   end
-
-  defp aws_bucket, do: Application.get_env(:ex_aws, :bucket)
-
-  defp get_action([], "true") do
-    :rmv # no uploaded photo and request to remove profile pic
-  end
-
-  defp get_action([], "false") do
-    :non # no uploaded photo and no request to remove profile pic
-  end
-
-  defp get_action(_, _) do
-    :add # uploaded photo so will replace the existing wheter rmv_profile is selected or not
-  end
-
-  defp error_to_string(:too_large), do: "Selected file is too large"
-  defp error_to_string(:too_many_files), do: "You have selected too many files"
-  defp error_to_string(:not_accepted), do: "Only file types allowed are jpg, jpeg and png"
 end
