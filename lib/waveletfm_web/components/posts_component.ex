@@ -20,7 +20,9 @@ defmodule WaveletFMWeb.Components.PostsComponent do
         <% wavelet = post.wavelet %>
         <div class="fm-container">
         <%= if fm.profiled do %>
-          <% img_src = "/uploads/" <> fm.id %>
+          <% bucket = Application.get_env(:ex_aws, :bucket) %>
+          <% region = Application.get_env(:ex_aws, :region) %>
+          <% img_src = "https://#{bucket}.s3.#{region}.amazonaws.com/public/" <> fm.id %>
             <div class="profile-img-container">
               <img src={img_src} alt="Profile Picture" class="profile-img" />
             </div>
