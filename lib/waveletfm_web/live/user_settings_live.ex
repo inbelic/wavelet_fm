@@ -268,7 +268,7 @@ defmodule WaveletFMWeb.UserSettingsLive do
         ExAws.S3.delete_object(aws_bucket(), "public/" <> fm.id) |> ExAws.request()
       end
       Accounts.delete_user(user) # from the creation of the tables this will delete the fm and corresponding posts automatically
-      {:noreply, socket}
+      {:noreply, assign(socket, trigger_submit: true)}
     else
       {:noreply, put_flash(socket, :error, "Incorrect password")}
     end
