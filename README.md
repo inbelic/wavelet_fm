@@ -1,7 +1,8 @@
 # WaveletFM
 
 Given I am not the best at keeping in touch by text with my distant friends, and
-I have recently moved. Maybe another way to keep in touch is to see how they are
+I have recently moved, it was natural to try and build something to help with
+that. Maybe another way to keep in touch is to see how they are
 doing is through a daily music song. Further, as I had to wait for my thesis
 feedback, it was the perfect chance for a week long hackathon! Having
 approximately 0 hours previous experience in web development (HTML, CSS and JS)
@@ -35,8 +36,8 @@ There are a number of features and improvements on the roadmap.
 
 ### v0.1-release:
 
-- [ ] Enable Swoosh production API
-- [ ] Enable external uploading of profile pictures for scaling
+- [X] Enable Swoosh production API
+- [X] Enable external uploading of profile pictures for scaling
 
 ### v-0.1-public:
 - [ ] Add terms and privacy
