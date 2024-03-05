@@ -65,6 +65,7 @@ defmodule WaveletFM.MixProject do
       {:ex_aws, "~> 2.0"},
       {:ex_aws_s3, "~> 2.0"},
       {:ranch, "~> 2.1"},
+      {:gen_smtp, "~> 1.2"},
     ]
   end
 

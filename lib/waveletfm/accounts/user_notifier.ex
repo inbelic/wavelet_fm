@@ -3,12 +3,14 @@ defmodule WaveletFM.Accounts.UserNotifier do
 
   alias WaveletFM.Mailer
 
+  defp aws_ses_email, do: Application.get_env(:waveletfm, :aws_ses_email)
+
   # Delivers the email using the application mailer.
   defp deliver(recipient, subject, body) do
     email =
       new()
       |> to(recipient)
-      |> from({"WaveletFM", "contact@example.com"})
+      |> from({"WaveletFM", aws_ses_email()})
       |> subject(subject)
       |> text_body(body)
 

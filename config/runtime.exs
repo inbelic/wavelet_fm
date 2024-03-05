@@ -22,7 +22,8 @@ end
 
 config :waveletfm,
   spotify_client_id: System.get_env("SPOTIFY_CLIENT_ID", nil),
-  spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET", nil)
+  spotify_client_secret: System.get_env("SPOTIFY_CLIENT_SECRET", nil),
+  aws_ses_email: System.get_env("AWS_SES_EMAIL", nil)
 
 config :ex_aws,
   region: System.get_env("AWS_REGION", nil),
@@ -32,9 +33,9 @@ config :ex_aws,
 
 config :waveletfm, WaveletFM.Mailer,
   adapter: Swoosh.Adapters.AmazonSES,
-  region: System.get_env("AWS_REGION", nil),
-  access_key_id: System.get_env("AWS_ACCESS_KEY_ID", nil),
-  secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY", nil)
+  region: System.get_env("AWS_SES_REGION", nil),
+  access_key: System.get_env("AWS_ACCESS_KEY_ID", nil),
+  secret: System.get_env("AWS_SECRET_ACCESS_KEY", nil)
 
 if config_env() == :prod do
   database_url =
@@ -70,6 +71,7 @@ if config_env() == :prod do
   config :waveletfm, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
   config :waveletfm, WaveletFMWeb.Endpoint,
+    check_origin: ["//waveletfm.fly.dev", "//waveletfm.ca"],
     url: [host: host, port: 443, scheme: "https"],
     http: [
       # Enable IPv6 and bind on all interfaces.
