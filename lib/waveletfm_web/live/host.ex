@@ -61,61 +61,18 @@ defmodule WaveletFMWeb.Host do
   end
   
   def handle_event("selected", %{"wavelet" => json_wavelet}, socket) do
-    case socket.assigns.wavelet do
-      nil ->
-        replace_wavelet = to_wavelet(json_wavelet)
-        posts = socket.assigns.current_fm |> Posts.get_posts_by_fm()
-        if Enum.count(posts) < 5 do
-          socket =
-            socket
-            |> push_event("search-modal", %{on: true})
-            |> assign(wavelet: replace_wavelet)
-          {:noreply, socket}
-        else
-          post = Enum.at(posts, 0)
-          {:ok, current_time} = DateTime.now("Etc/UTC")
-          diff = DateTime.diff(current_time, post.inserted_at, :hour)
-          if diff < 24 do
-            socket =
-              socket
-              |> put_flash(:error, "You must wait #{24 - diff} hours until your next update.")
-            {:noreply, socket}
-          else
-            socket =
-              socket
-              |> push_event("search-modal", %{on: true})
-              |> assign(wavelet: replace_wavelet)
-            {:noreply, socket}
-          end
-        end
-      replace_wavelet ->
-        searched_wavelet = to_wavelet(json_wavelet)
-
-        # If the wavelet is not an empty one, then delete the parent post
-        {:ok, _} =
-          socket.assigns.current_fm
-          |> Posts.get_posts_by_fm()
-          |> Enum.find(fn post ->
-            post.wavelet == replace_wavelet.id
-          end)
-          |> case do
-            nil -> {:ok, nil}
-            post -> Posts.delete_post(post)
-          end
-
-        # Create a new post on the users fm with the selected search wavelet
-        # values
-        {:ok, wavelet} = Wavelets.create_wavelet(searched_wavelet)
-        {:ok, _post} = Posts.create_post(socket.assigns.current_fm, wavelet)
-        wavelet = set_reactions(wavelet, empty_reaction())
-
+    case {socket.assigns.current_user.confirmed_at, socket.assigns.wavelet} do
+      {nil, _} ->
         socket =
           socket
-          |> stream_delete(:wavelets, replace_wavelet)
-          |> stream_insert(:wavelets, wavelet, at: 0)
-          |> push_event("search-modal", %{on: false})
-
-        {:noreply, push_patch(socket, to: ~p"/host")}
+          |> put_flash(:error, "You must confirm your account before broadcasting.")
+        {:noreply, socket}
+      {_, nil} ->
+        replace_wavelet = to_wavelet(json_wavelet)
+        set_replacement(socket, replace_wavelet)
+      {_, replace_wavelet} ->
+        searched_wavelet = to_wavelet(json_wavelet)
+        replace_wavelet(socket, replace_wavelet, searched_wavelet)
     end
   end
 
@@ -149,6 +106,62 @@ defmodule WaveletFMWeb.Host do
       assign(socket, form: form)
     end
   end
+
+  defp set_replacement(socket, replace_wavelet) do
+    posts = socket.assigns.current_fm |> Posts.get_posts_by_fm()
+    if Enum.count(posts) < 5 do
+      socket =
+        socket
+        |> push_event("search-modal", %{on: true})
+        |> assign(wavelet: replace_wavelet)
+      {:noreply, socket}
+    else
+      post = Enum.at(posts, 0)
+      {:ok, current_time} = DateTime.now("Etc/UTC")
+      diff = DateTime.diff(current_time, post.inserted_at, :hour)
+      if diff < 24 do
+        socket =
+          socket
+          |> put_flash(:error, "You must wait #{24 - diff} hours until your next update.")
+        {:noreply, socket}
+      else
+        socket =
+          socket
+          |> push_event("search-modal", %{on: true})
+          |> assign(wavelet: replace_wavelet)
+        {:noreply, socket}
+      end
+    end
+  end
+
+  defp replace_wavelet(socket, replace_wavelet, searched_wavelet) do
+    # If the wavelet is not an empty one, then delete the parent post
+    {:ok, _} =
+      socket.assigns.current_fm
+      |> Posts.get_posts_by_fm()
+      |> Enum.find(fn post ->
+        post.wavelet == replace_wavelet.id
+      end)
+      |> case do
+        nil -> {:ok, nil}
+        post -> Posts.delete_post(post)
+      end
+
+    # Create a new post on the users fm with the selected search wavelet
+    # values
+    {:ok, wavelet} = Wavelets.create_wavelet(searched_wavelet)
+    {:ok, _post} = Posts.create_post(socket.assigns.current_fm, wavelet)
+    wavelet = set_reactions(wavelet, empty_reaction())
+
+    socket =
+      socket
+      |> stream_delete(:wavelets, replace_wavelet)
+      |> stream_insert(:wavelets, wavelet, at: 0)
+      |> push_event("search-modal", %{on: false})
+
+    {:noreply, push_patch(socket, to: ~p"/host")}
+  end
+
 
   defp empty_wavelet() do
     %Wavelet{id: "empty", title: "Not Selected", artist: "",
