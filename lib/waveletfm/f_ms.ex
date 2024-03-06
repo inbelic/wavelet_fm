@@ -4,7 +4,6 @@ defmodule WaveletFM.FMs do
   """
 
   import Ecto.Query, warn: false
-  import Ecto.Changeset
   alias WaveletFM.Repo
 
   alias WaveletFM.Accounts.User
